@@ -213,8 +213,10 @@ var/global/floorIsLava = 0
 	var/f = 1
 	for(var/k in all_languages)
 		var/datum/language/L = all_languages[k]
-		if(!f) body += " | "
-		else f = 0
+		if(!f)
+			body += " | "
+		else
+			f = 0
 		if(L in M.languages)
 			body += "<a href='?src=\ref[src];toglang=\ref[M];lang=[html_encode(k)]' style='color:#006600'>[k]</a>"
 		else
@@ -324,8 +326,10 @@ var/global/floorIsLava = 0
 	var/savefile/info = new("data/player_saves/[copytext(key, 1, 2)]/[key]/info.sav")
 	var/list/infos
 	info >> infos
-	if(!infos || !infos.len) return 0
-	else return 1
+	if(!infos || !infos.len)
+		return 0
+	else
+		return 1
 
 /proc/exportnotes(var/key as text)
 	var/savefile/info = new("data/player_saves/[copytext(key, 1, 2)]/[key]/info.sav")
@@ -640,7 +644,8 @@ var/global/floorIsLava = 0
 
 
 /datum/admins/proc/Jobbans()
-	if(!check_rights(R_BAN))	return
+	if(!check_rights(R_BAN))
+		return
 
 	var/dat = "<B>Job Bans!</B><HR><table>"
 	for(var/t in jobban_keylist)
@@ -652,7 +657,8 @@ var/global/floorIsLava = 0
 	usr << browse(dat, "window=ban;size=400x400")
 
 /datum/admins/proc/Game()
-	if(!check_rights(0))	return
+	if(!check_rights(0))
+		return
 
 	var/dat = {"
 		<center><B>Game Panel</B></center><hr>\n
@@ -691,7 +697,8 @@ var/global/floorIsLava = 0
 	return
 
 /datum/admins/proc/Secrets()
-	if(!check_rights(0))	return
+	if(!check_rights(0))
+		return
 
 	var/dat = "<B>The first rule of adminbuse is: you don't talk about the adminbuse.</B><HR>"
 
@@ -831,7 +838,7 @@ var/global/floorIsLava = 0
 		<B>Coder Secrets</B><BR>
 		<BR>
 		<A href='?src=\ref[src];secretsadmin=list_job_debug'>Show Job Debug</A><BR>
-		<A href='?src=\ref[src];secretsadmin=spawn_objects'>Admin Log</A><BR>
+		<A href='?src=\ref[src];secretsadmin=show_admin_log'>Admin Log</A><BR>
 		<BR>
 		"}
 
@@ -854,6 +861,7 @@ var/global/floorIsLava = 0
 		<a href='?src=\ref[src];shuttle_create_destination=1'>Create a destination docking port</a><br>
 		<a href='?src=\ref[src];shuttle_modify_destination=1'>Add a destination docking port</a><br>
 		<a href='?src=\ref[src];shuttle_set_transit=1'>Modify transit area</a><br>
+		<a href='?src=\ref[src];shuttle_generate_transit=1'>Generate new transit area</a><br>
 		<a href='?src=\ref[src];shuttle_get_console=1'>Get control console</a><br>
 		<a href='?src=\ref[src];shuttle_edit=1'>Modify parameters[selected_shuttle.is_special() ? " and pre-defined areas" : ""]</a>
 		<hr>
@@ -1045,7 +1053,8 @@ var/global/floorIsLava = 0
 	set desc="Delay the game start/end"
 	set name="Delay"
 
-	if(!check_rights(R_ADMIN))	return
+	if(!check_rights(R_ADMIN))
+		return
 	if (!ticker || ticker.current_state != GAME_STATE_PREGAME)
 		if(ticker.delay_end == 2)
 			to_chat(world, "<font size=4><span class='danger'>World Reboot triggered by [key_name(usr)]!</font></span>")
@@ -1103,7 +1112,8 @@ var/global/floorIsLava = 0
 	set desc="Reboots the server post haste"
 	set name="Immediate Reboot"
 
-	if(!usr.client.holder)	return
+	if(!usr.client.holder)
+		return
 	if( alert("Reboot server?",,"Yes","No") == "No")
 		return
 	to_chat(world, "<span class='warning'><b>Rebooting world!</b> <span class='notice'>Initiated by [usr.client.holder.fakekey ? "Admin" : usr.key]!</span>")
@@ -1128,9 +1138,9 @@ var/global/floorIsLava = 0
 	set category = "Admin"
 	set name = "Unprison"
 
-	if (M.z == 2)
+	if (M.z == map.zCentcomm)
 		if (config.allow_admin_jump)
-			M.loc = pick(latejoin)
+			M.forceMove(pick(latejoin))
 			message_admins("[key_name_admin(usr)] has unprisoned [key_name_admin(M)]", 1)
 			log_admin("[key_name(usr)] has unprisoned [key_name(M)]")
 		else
@@ -1162,7 +1172,7 @@ var/global/floorIsLava = 0
 		if (ticker.mode.config_tag == "nuclear")
 			return 2
 		return 1
-	if(iswizard(M))
+	if(iswizard(M) || isapprentice(M))
 		if (ticker.mode.config_tag == "wizard")
 			return 2
 		return 1
@@ -1197,7 +1207,7 @@ var/global/floorIsLava = 0
 		if(3)
 			var/count = 0
 			for(var/mob/living/carbon/monkey/Monkey in world)
-				if(Monkey.z == 1)
+				if(Monkey.z == map.zMainStation)
 					count++
 			return "Kill all [count] of the monkeys on the station"
 		if(4)
@@ -1210,7 +1220,8 @@ var/global/floorIsLava = 0
 	set desc = "(atom path) Spawn an atom"
 	set name = "Spawn"
 
-	if(!check_rights(R_SPAWN))	return
+	if(!check_rights(R_SPAWN))
+		return
 
 	var/list/matches = new()
 
@@ -1298,7 +1309,7 @@ var/global/floorIsLava = 0
 			to_chat(usr, "<b>AI [key_name(S, usr)]'s laws:</b>")
 		else if(isrobot(S))
 			var/mob/living/silicon/robot/R = S
-			to_chat(usr, "<b>CYBORG [key_name(S, usr)] [R.connected_ai?"(Slaved to: [R.connected_ai])":"(Independant)"]: laws:</b>")
+			to_chat(usr, "<b>[isMoMMI(R) ? "Mobile-MMI" : "CYBORG"] [key_name(S, usr)] [R.connected_ai?"(Slaved to: [R.connected_ai])":"(Independant)"]: laws:</b>")
 		else if (ispAI(S))
 			var/mob/living/silicon/pai/pAI = S
 			to_chat(usr, "<b>pAI [key_name(S, usr)]'s laws (master: [pAI.master] ):</b>")

@@ -43,7 +43,8 @@
 
 /mob/living/carbon/monkey/abiotic()
 	for(var/obj/item/I in held_items)
-		if(I.abstract) continue
+		if(I.abstract)
+			continue
 
 		return 1
 
@@ -56,7 +57,7 @@
 	icon_state = "tajkey1"
 	uni_append = list(0x0A0,0xE00) // 0A0E00
 	species_type = /mob/living/carbon/monkey/tajara
-	languagetoadd = "Siik'tajr"
+	languagetoadd = LANGUAGE_CATBEAST
 
 /mob/living/carbon/monkey/skrell
 	name = "neaera"
@@ -65,7 +66,7 @@
 	icon_state = "skrellkey1"
 	uni_append = list(0x01C,0xC92) // 01CC92
 	species_type = /mob/living/carbon/monkey/skrell
-	languagetoadd = "Skrellian"
+	languagetoadd = LANGUAGE_SKRELLIAN
 
 /mob/living/carbon/monkey/unathi
 	name = "stok"
@@ -75,7 +76,7 @@
 	uni_append = list(0x044,0xC5D) // 044C5D
 	canWearClothes = 0
 	species_type = /mob/living/carbon/monkey/unathi
-	languagetoadd = "Sinta'unathi"
+	languagetoadd = LANGUAGE_UNATHI
 
 /mob/living/carbon/monkey/New()
 	var/datum/reagents/R = new/datum/reagents(1000)
@@ -154,7 +155,8 @@
 			return -1
 
 	var/health_deficiency = (100 - health)
-	if(health_deficiency >= 45) tally += (health_deficiency / 25)
+	if(health_deficiency >= 45)
+		tally += (health_deficiency / 25)
 
 	if (bodytemperature < 283.222)
 		tally += (283.222 - bodytemperature) / 10 * 1.75
@@ -247,8 +249,10 @@
 
 /mob/living/carbon/monkey/proc/defense(var/power, var/def_zone)
 	var/armor = run_armor_check(def_zone, "melee", "Your armor has protected your [def_zone].", "Your armor has softened hit to your [def_zone].")
-	if(armor >= 2)	return 0
-	if(!power)	return 0
+	if(armor >= 2)
+		return 0
+	if(!power)
+		return 0
 
 	var/damage = power
 	if(armor)
@@ -316,7 +320,7 @@
 						O.show_message(text("<span class='danger'>[] has attempted to punch [name]!</span>", M), 1)
 		else
 			if (M.a_intent == I_GRAB)
-				if (M == src || anchored)
+				if (M.grab_check(src))
 					return
 
 				var/obj/item/weapon/grab/G = getFromPool(/obj/item/weapon/grab,M,src)
@@ -386,7 +390,7 @@
 						O.show_message(text("<span class='danger'>[] has attempted to lunge at [name]!</span>", M), 1)
 
 		if (I_GRAB)
-			if (M == src)
+			if (M.grab_check(src))
 				return
 			var/obj/item/weapon/grab/G = getFromPool(/obj/item/weapon/grab,M,src)
 
@@ -425,7 +429,8 @@
 		to_chat(M, "You cannot attack people before the game has started.")
 		return
 
-	if(M.Victim) return // can't attack while eating!
+	if(M.Victim)
+		return // can't attack while eating!
 
 	if (health > -100)
 
@@ -448,12 +453,18 @@
 			var/power = M.powerlevel + rand(0,3)
 
 			switch(M.powerlevel)
-				if(1 to 2) stunprob = 20
-				if(3 to 4) stunprob = 30
-				if(5 to 6) stunprob = 40
-				if(7 to 8) stunprob = 60
-				if(9) 	   stunprob = 70
-				if(10) 	   stunprob = 95
+				if(1 to 2)
+					stunprob = 20
+				if(3 to 4)
+					stunprob = 30
+				if(5 to 6)
+					stunprob = 40
+				if(7 to 8)
+					stunprob = 60
+				if(9)
+					stunprob = 70
+				if(10)
+					stunprob = 95
 
 			if(prob(stunprob))
 				M.powerlevel -= 3
@@ -513,7 +524,8 @@
 	if(flags & INVULNERABLE)
 		return
 
-	if(wear_id) wear_id.emp_act(severity)
+	if(wear_id)
+		wear_id.emp_act(severity)
 	..()
 
 /mob/living/carbon/monkey/ex_act(severity)
@@ -572,6 +584,13 @@
 		ACL |= I.GetAccess()
 	return ACL
 
+/mob/living/carbon/monkey/get_visible_id()
+	var/id = null
+	for(var/obj/item/I in held_items)
+		id = I.GetID()
+		if(id)
+			break
+	return id
 
 /mob/living/carbon/monkey/assess_threat(var/obj/machinery/bot/secbot/judgebot, var/lasercolor)
 	if(judgebot.emagged == 2)
@@ -613,8 +632,6 @@
 
 /mob/living/carbon/monkey/reset_layer()
 	if(lying)
-		plane = PLANE_OBJ
-		layer = MOB_LAYER - 0.1 //so we move under bedsheets
+		plane = LYING_MOB_PLANE
 	else
-		plane = PLANE_MOB
-		layer = MOB_LAYER
+		plane = MOB_PLANE

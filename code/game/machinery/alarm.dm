@@ -134,15 +134,15 @@
 
 	if(building)
 		if(loc)
-			src.loc = loc
+			src.forceMove(loc)
 
 		if(dir)
 			src.dir = dir
 
 		buildstage = 0
 		wiresexposed = 1
-		pixel_x = (dir & 3)? 0 : (dir == 4 ? -24 : 24)
-		pixel_y = (dir & 3)? (dir ==1 ? -24 : 24) : 0
+		pixel_x = (dir & 3)? 0 : (dir == 4 ? -24 * PIXEL_MULTIPLIER : 24 * PIXEL_MULTIPLIER)
+		pixel_y = (dir & 3)? (dir ==1 ? -24 * PIXEL_MULTIPLIER: 24 * PIXEL_MULTIPLIER) : 0
 		update_icon()
 		if(ticker && ticker.current_state == 3)//if the game is running
 			src.initialize()
@@ -190,7 +190,8 @@
 		return
 
 	var/turf/simulated/location = loc
-	if(!istype(location))	return//returns if loc is not simulated
+	if(!istype(location))
+		return//returns if loc is not simulated
 
 	var/datum/gas_mixture/environment = location.return_air()
 
@@ -651,7 +652,8 @@
 
 /obj/machinery/alarm/Topic(href, href_list)
 	if(href_list["close"])
-		if(usr.machine == src) usr.unset_machine()
+		if(usr.machine == src)
+			usr.unset_machine()
 		return 1
 	if(..())
 		return 1
@@ -871,10 +873,6 @@
 	if (buildstage < 1)
 		to_chat(user, "<span class='info'>The circuit is missing.</span>")
 
-/obj/machinery/alarm/change_area(oldarea, newarea)
-	..()
-	name = replacetext(name,oldarea,newarea)
-
 /obj/machinery/alarm/wirejack(var/mob/living/silicon/pai/P)
 	if(..())
 		locked = !locked
@@ -949,7 +947,8 @@ FIRE ALARM
 	return src.attack_hand(user)
 
 /obj/machinery/firealarm/emp_act(severity)
-	if(prob(50/severity)) alarm()
+	if(prob(50/severity))
+		alarm()
 	..()
 
 /obj/machinery/firealarm/attackby(obj/item/W as obj, mob/user as mob)
@@ -1085,7 +1084,8 @@ FIRE ALARM
 	return
 
 /obj/machinery/firealarm/Topic(href, href_list)
-	if(..()) return 1
+	if(..())
+		return 1
 	if (usr.stat || stat & (BROKEN|NOPOWER))
 		return
 
@@ -1134,7 +1134,7 @@ var/global/list/firealarms = list() //shrug
 	..()
 	name = "[areaMaster.name] fire alarm"
 	if(loc)
-		src.loc = loc
+		src.forceMove(loc)
 
 	if(dir)
 		src.dir = dir
@@ -1142,8 +1142,8 @@ var/global/list/firealarms = list() //shrug
 	if(building)
 		buildstage = 0
 		wiresexposed = 1
-		pixel_x = (dir & 3)? 0 : (dir == 4 ? -24 : 24)
-		pixel_y = (dir & 3)? (dir ==1 ? -24 : 24) : 0
+		pixel_x = (dir & 3)? 0 : (dir == 4 ? -24 * PIXEL_MULTIPLIER: 24 * PIXEL_MULTIPLIER)
+		pixel_y = (dir & 3)? (dir ==1 ? -24 * PIXEL_MULTIPLIER: 24 * PIXEL_MULTIPLIER) : 0
 
 	machines.Remove(src)
 	firealarms |= src
@@ -1152,10 +1152,6 @@ var/global/list/firealarms = list() //shrug
 /obj/machinery/firealarm/Destroy()
 	firealarms.Remove(src)
 	..()
-
-/obj/machinery/firealarm/change_area(oldarea, newarea)
-	..()
-	name = replacetext(name,oldarea,newarea)
 
 /obj/machinery/partyalarm
 	name = "\improper PARTY BUTTON"
@@ -1229,7 +1225,8 @@ var/global/list/firealarms = list() //shrug
 	return
 
 /obj/machinery/partyalarm/Topic(href, href_list)
-	if(..()) return 1
+	if(..())
+		return 1
 	if (usr.stat || stat & (BROKEN|NOPOWER))
 		return
 

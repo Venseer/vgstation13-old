@@ -76,7 +76,7 @@
 		if(index > raider_spawn.len)
 			index = 1
 
-		raider.current.loc = raider_spawn[index]
+		raider.current.forceMove(raider_spawn[index])
 		index++
 
 
@@ -98,9 +98,8 @@
 		vox.set_species("Vox")
 		vox.generate_name()
 		//vox.languages = HUMAN // Removing language from chargen.
-		vox.flavor_text = ""
-		vox.default_language = all_languages["Vox-pidgin"]
-		vox.species.default_language = "Vox-pidgin"
+		vox.default_language = all_languages[LANGUAGE_VOX]
+		vox.species.default_language = LANGUAGE_VOX
 		vox.remove_language(LANGUAGE_GALACTIC_COMMON)
 		vox.h_style = "Short Vox Quills"
 		vox.f_style = "Shaved"
@@ -113,7 +112,8 @@
 		greet_vox(raider)
 
 	spawn (rand(waittime_l, waittime_h))
-		if(!mixed) send_intercept()
+		if(!mixed)
+			send_intercept()
 
 /datum/game_mode/heist/proc/is_raider_crew_alive()
 	var/raider_crew_count = raiders.len

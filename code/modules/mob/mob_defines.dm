@@ -1,7 +1,7 @@
 
 /mob
 	density = 1
-	layer = 4.0
+	layer = MOB_LAYER
 	animate_movement = 2
 
 	w_type = RECYK_BIOLOGICAL
@@ -12,8 +12,6 @@
 
 	var/stat = 0 //Whether a mob is alive or dead. TODO: Move this to living - Nodrak
 
-	var/obj/screen/flash = null
-	var/obj/screen/blind = null
 	var/obj/screen/hands = null
 	var/obj/screen/pullin = null
 	var/obj/screen/kick_icon = null
@@ -87,7 +85,6 @@
 	var/stuttering = null	//Carbon
 	var/slurring = null		//Carbon
 	var/real_name = null
-	var/flavor_text = ""
 	var/med_record = ""
 	var/sec_record = ""
 	var/gen_record = ""
@@ -97,7 +94,6 @@
 	var/druggy = 0			//Carbon
 	var/confused = 0		//Carbon
 	var/antitoxs = null
-	var/plasma = null
 	var/sleeping = 0		//Carbon
 	var/resting = 0			//Carbon
 	var/lying = 0
@@ -105,7 +101,6 @@
 	var/canmove = 1
 	var/candrop = 1
 	var/lastpuke = 0
-	var/unacidable = 0
 
 	var/size = SIZE_NORMAL
 	//SIZE_TINY for tiny animals like mice and borers
@@ -170,8 +165,6 @@
 	var/in_throw_mode = 0
 
 	var/coughedtime = null
-
-	var/inertia_dir = 0
 
 	var/job = null//Living
 
@@ -282,8 +275,11 @@
 
 	var/list/languages[0]
 	var/stat_fucked = 1
+	var/event/on_spellcast
 	var/event/on_uattack
 	var/event/on_logout
+	var/event/on_damaged
+
 	forceinvertredraw = 1
 
 	var/list/alphas = list()

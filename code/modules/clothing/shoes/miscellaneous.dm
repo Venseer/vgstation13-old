@@ -7,7 +7,7 @@
 	item_state = "brown"
 	permeability_coefficient = 0.05
 	flags = NOSLIP
-	origin_tech = "syndicate=3"
+	origin_tech = Tc_SYNDICATE + "=3"
 	var/list/clothing_choices = list()
 	siemens_coefficient = 0.8
 	species_fit = list(VOX_SHAPED)
@@ -122,6 +122,7 @@
 	item_state = "clown_shoes"
 	slowdown = SHOES_SLOWDOWN+1
 	_color = "clown"
+	footprint_type = /obj/effect/decal/cleanable/blood/tracks/footprints/clown
 
 	var/step_sound = "clownstep"
 	var/footstep = 1	//used for squeeks whilst walking
@@ -237,6 +238,13 @@
 			step_sound = sound_list[pick(sound_list)]
 	..()
 
+/obj/item/clothing/shoes/clown_shoes/stickymagic
+	canremove = 0
+	wizard_garb = 1
+
+/obj/item/clothing/shoes/clown_shoes/stickymagic/acidable()
+	return 0
+
 #undef CLOWNSHOES_RANDOM_SOUND
 
 /obj/item/clothing/shoes/jackboots
@@ -249,6 +257,7 @@
 	species_fit = list(VOX_SHAPED)
 	heat_conductivity = INS_SHOE_HEAT_CONDUCTIVITY
 	bonus_kick_damage = 3
+	footprint_type = /obj/effect/decal/cleanable/blood/tracks/footprints/boots
 
 /obj/item/clothing/shoes/jackboots/knifeholster/New() //This one comes with preloaded knife holster
 	..()
@@ -257,6 +266,12 @@
 /obj/item/clothing/shoes/jackboots/batmanboots
 	name = "batboots"
 	desc = "Criminal stomping boots for fighting crime and looking good."
+
+/obj/item/clothing/shoes/jackboots/neorussian
+	name = "neo-Russian boots"
+	desc = "Tovarish, no one will realize you stepped on a pile of shit if your pair already looks like shit."
+	icon_state = "nr_boots"
+	item_state = "nr_boots"
 
 /obj/item/clothing/shoes/cult
 	name = "boots"
@@ -361,3 +376,11 @@
 	desc = ""
 	icon_state = "doom"
 	item_state = "doom"
+
+/obj/item/clothing/shoes/workboots
+	name = "Workboots"
+	desc = "Thick-soled boots for industrial work environments."
+	icon_state = "workboots"
+	item_state = "workboots"
+	species_fit = list(VOX_SHAPED)
+	footprint_type = /obj/effect/decal/cleanable/blood/tracks/footprints/boots

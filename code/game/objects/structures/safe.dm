@@ -36,7 +36,7 @@ FLOOR SAFES
 			return
 		if(I.w_class + space <= maxspace)
 			space += I.w_class
-			I.loc = src
+			I.forceMove(src)
 
 
 /obj/structure/safe/proc/check_unlocked(mob/user as mob, canhear)
@@ -46,7 +46,8 @@ FLOOR SAFES
 		if(tumbler_2_pos == tumbler_2_open)
 			to_chat(user, "<span class='notice'>You hear a [pick("tink", "krink", "plink")] from [src].</span>")
 	if(tumbler_1_pos == tumbler_1_open && tumbler_2_pos == tumbler_2_open)
-		if(user) visible_message("<b>[pick("Spring", "Sprang", "Sproing", "Clunk", "Krunk")]!</b>")
+		if(user)
+			visible_message("<b>[pick("Spring", "Sprang", "Sproing", "Clunk", "Krunk")]!</b>")
 		return 1
 	return 0
 
@@ -88,7 +89,8 @@ FLOOR SAFES
 
 
 /obj/structure/safe/Topic(href, href_list)
-	if(!ishuman(usr))	return
+	if(!ishuman(usr))
+		return
 	var/mob/living/carbon/human/user = usr
 
 	var/canhear = 0
@@ -174,7 +176,7 @@ obj/structure/safe/ex_act(severity)
 	icon_state = "floorsafe"
 	density = 0
 	level = 1	//underfloor
-	layer = 2.5
+	layer = BELOW_OBJ_LAYER
 
 
 /obj/structure/safe/floor/initialize()

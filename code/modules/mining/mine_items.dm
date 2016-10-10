@@ -4,7 +4,6 @@
 /obj/effect/light_emitter
 	name = "Light-emtter"
 	anchored = 1
-	unacidable = 1
 	light_range = 8
 
 /**********************Miner Lockers**************************/
@@ -47,7 +46,8 @@ var/mining_shuttle_moving = 0
 var/mining_shuttle_location = 0 // 0 = station 13, 1 = mining station
 
 proc/move_mining_shuttle()
-	if(mining_shuttle_moving)	return
+	if(mining_shuttle_moving)
+		return
 	mining_shuttle_moving = 1
 	spawn(mining_shuttle_tickstomove*10)
 		var/area/fromArea
@@ -192,7 +192,7 @@ proc/move_mining_shuttle()
 	starting_materials = list(MAT_IRON = 3750) //one sheet, but where can you make them?
 	w_type = RECYK_METAL
 	var/digspeed = 40 //moving the delay to an item var so R&D can make improved picks. --NEO
-	origin_tech = "materials=1;engineering=1"
+	origin_tech = Tc_MATERIALS + "=1;" + Tc_ENGINEERING + "=1"
 	attack_verb = list("hits", "pierces", "slices", "attacks")
 	var/drill_sound = 'sound/weapons/Genhit.ogg'
 	var/drill_verb = "picking"
@@ -211,7 +211,7 @@ proc/move_mining_shuttle()
 	icon_state = "spickaxe"
 	item_state = "spickaxe"
 	digspeed = 30
-	origin_tech = "materials=3"
+	origin_tech = Tc_MATERIALS + "=3"
 	desc = "This makes no metallurgic sense."
 
 /obj/item/weapon/pickaxe/jackhammer
@@ -219,7 +219,7 @@ proc/move_mining_shuttle()
 	icon_state = "jackhammer"
 	item_state = "jackhammer"
 	digspeed = 20 //faster than drill, but cannot dig
-	origin_tech = "materials=3;powerstorage=2;engineering=2"
+	origin_tech = Tc_MATERIALS + "=3;" + Tc_POWERSTORAGE + "=2;" + Tc_ENGINEERING + "=2"
 	desc = "Cracks rocks with sonic blasts, perfect for killing cave lizards."
 	drill_verb = "hammering"
 
@@ -228,7 +228,7 @@ proc/move_mining_shuttle()
 	icon_state = "gpickaxe"
 	item_state = "gpickaxe"
 	digspeed = 20
-	origin_tech = "materials=4"
+	origin_tech = Tc_MATERIALS + "=4"
 	desc = "This makes no metallurgic sense."
 
 /obj/item/weapon/pickaxe/plasmacutter
@@ -240,7 +240,7 @@ proc/move_mining_shuttle()
 	heat_production = 3800
 	digspeed = 20 //Can slice though normal walls, all girders, or be used in reinforced wall deconstruction/ light thermite on fire
 	sharpness = 1.0
-	origin_tech = "materials=4;plasmatech=3;engineering=3"
+	origin_tech = Tc_MATERIALS + "=4;" + Tc_PLASMATECH + "=3;" + Tc_ENGINEERING + "=3"
 	desc = "A rock cutter that uses bursts of hot plasma. You could use it to cut limbs off of xenos! Or, you know, mine stuff."
 	diggables = DIG_ROCKS | DIG_WALLS
 	drill_verb = "cutting"
@@ -255,7 +255,7 @@ proc/move_mining_shuttle()
 	item_state = "dpickaxe"
 	digspeed = 10
 	sharpness = 1.2
-	origin_tech = "materials=6;engineering=4"
+	origin_tech = Tc_MATERIALS + "=6;" + Tc_ENGINEERING + "=4"
 	desc = "A pickaxe with a diamond pick head, this is just like minecraft."
 
 /obj/item/weapon/pickaxe/drill
@@ -263,7 +263,7 @@ proc/move_mining_shuttle()
 	icon_state = "handdrill"
 	item_state = "jackhammer"
 	digspeed = 30
-	origin_tech = "materials=2;powerstorage=3;engineering=2"
+	origin_tech = Tc_MATERIALS + "=2;" + Tc_POWERSTORAGE + "=3;" + Tc_ENGINEERING + "=2"
 	desc = "Yours is the drill that will pierce through the rock walls."
 	drill_verb = "drilling"
 
@@ -274,7 +274,7 @@ proc/move_mining_shuttle()
 	icon_state = "diamonddrill"
 	item_state = "jackhammer"
 	digspeed = 5 //Digs through walls, girders, and can dig up sand
-	origin_tech = "materials=6;powerstorage=4;engineering=5"
+	origin_tech = Tc_MATERIALS + "=6;" + Tc_POWERSTORAGE + "=4;" + Tc_ENGINEERING + "=5"
 	desc = "Yours is the drill that will pierce the heavens!"
 
 	diggables = DIG_ROCKS | DIG_SOIL | DIG_WALLS | DIG_RWALLS
@@ -298,7 +298,7 @@ proc/move_mining_shuttle()
 	w_class = W_CLASS_MEDIUM
 	sharpness = 0.5
 	w_type = RECYK_MISC
-	origin_tech = "materials=1;engineering=1"
+	origin_tech = Tc_MATERIALS + "=1;" + Tc_ENGINEERING + "=1"
 	attack_verb = list("bashes", "bludgeons", "thrashes", "whacks")
 
 
@@ -341,7 +341,7 @@ proc/move_mining_shuttle()
 	w_class = W_CLASS_SMALL
 	throw_speed = 3
 	throw_range = 5
-	origin_tech = "bluespace=2"
+	origin_tech = Tc_BLUESPACE + "=2"
 
 /obj/item/device/wormhole_jaunter/attack_self(mob/user as mob)
 	var/turf/device_turf = get_turf(user)
@@ -452,7 +452,7 @@ proc/move_mining_shuttle()
 	desc = "A resonating field that significantly damages anything inside of it when the field eventually ruptures."
 	icon = 'icons/effects/effects.dmi'
 	icon_state = "shield1"
-	layer = 4.1
+	plane = ABOVE_HUMAN_PLANE
 	mouse_opacity = 0
 	var/resonance_damage = 30
 	var/creator = null
@@ -627,11 +627,11 @@ proc/move_mining_shuttle()
 /mob/living/simple_animal/hostile/mining_drone/proc/CollectOre()
 	var/obj/item/weapon/ore/O
 	for(O in src.loc)
-		O.loc = src
+		O.forceMove(src)
 	for(var/dir in alldirs)
 		var/turf/T = get_step(src,dir)
 		for(O in T)
-			O.loc = src
+			O.forceMove(src)
 	return
 
 /mob/living/simple_animal/hostile/mining_drone/proc/DropOre()
@@ -639,7 +639,7 @@ proc/move_mining_shuttle()
 		return
 	for(var/obj/item/weapon/ore/O in contents)
 		contents -= O
-		O.loc = src.loc
+		O.forceMove(src.loc)
 	return
 
 /mob/living/simple_animal/hostile/mining_drone/adjustBruteLoss()
@@ -681,7 +681,12 @@ proc/move_mining_shuttle()
 				if(istype(target, /mob/living/simple_animal/hostile))
 					var/mob/living/simple_animal/hostile/H = M
 					H.friends += user
-					log_game("[user] has revived hostile mob [target] with a lazarus injector")
+
+					log_attack("[key_name(user)] has revived hostile mob [H] with a lazarus injector.")
+					H.attack_log += "\[[time_stamp()]\] Revived by <b>[key_name(user)]</b> with a lazarus injector."
+					user.attack_log += "\[[time_stamp()]\] Revived hostile mob <b>[H]</b> with a lazarus injector."
+					msg_admin_attack("[key_name(user)] has revived hostile mob [H] with a lazarus injector. (<A HREF='?_src_=holder;adminplayerobservecoodjump=1;X=[user.x];Y=[user.y];Z=[user.z]'>JMP</a>)")
+
 				loaded = 0
 				user.visible_message("<span class='warning'>[user] injects [M] with \the [src], reviving it.</span>", \
 				"<span class='notice'>You inject [M] with \the [src], reviving it.</span>")
@@ -730,7 +735,7 @@ proc/move_mining_shuttle()
 				name = "lazarus capsule - [mname]"
 	..()
 
-/obj/item/device/mobcapsule/throw_impact(atom/A, mob/user)
+/obj/item/device/mobcapsule/throw_impact(atom/A, speed, mob/user)
 	..()
 	if(!tripped)
 		if(contained_mob)
@@ -757,7 +762,7 @@ proc/move_mining_shuttle()
 		return 0
 	else if(AM.density || AM.anchored)
 		return 0
-	AM.loc = src
+	AM.forceMove(src)
 	contained_mob = AM
 	name = "lazarus capsule - [AM.name]"
 	return 1
@@ -770,19 +775,26 @@ proc/move_mining_shuttle()
 	/*
 	//Cham Projector Exception
 	for(var/obj/effect/dummy/chameleon/AD in src)
-		AD.loc = src.loc
+		AD.forceMove(src.loc)
 
 	for(var/obj/O in src)
-		O.loc = src.loc
+		O.forceMove(src.loc)
 
 	for(var/mob/M in src)
-		M.loc = src.loc
+		M.forceMove(src.loc)
 		if(M.client)
 			M.client.eye = M.client.mob
 			M.client.perspective = MOB_PERSPECTIVE
 */
 	if(contained_mob)
-		contained_mob.loc = src.loc
+		contained_mob.forceMove(src.loc)
+
+		var/turf/turf = get_turf(src)
+		log_attack("[key_name(user)] has released hostile mob [contained_mob] with a capsule in area [turf.loc] ([x],[y],[z]).")
+		contained_mob.attack_log += "\[[time_stamp()]\] Released by <b>[key_name(user)]</b> in area [turf.loc] ([x],[y],[z])."
+		user.attack_log += "\[[time_stamp()]\] Released hostile mob <b>[contained_mob]</b> in area [turf.loc] ([x],[y],[z])."
+		msg_admin_attack("[key_name(user)] has released hostile mob [contained_mob] with a capsule in area [turf.loc] ([x],[y],[z]) (<A HREF='?_src_=holder;adminplayerobservecoodjump=1;X=[x];Y=[y];Z=[z]'>JMP</A>).")
+
 		if(contained_mob.client)
 			contained_mob.client.eye = contained_mob.client.mob
 			contained_mob.client.perspective = MOB_PERSPECTIVE
@@ -801,7 +813,8 @@ proc/move_mining_shuttle()
 		if(istype(AM))
 			var/mob/living/simple_animal/M = AM
 			var/mob/living/simple_animal/hostile/H = M
-			if(!istype(H)) continue
+			if(!istype(H))
+				continue
 			for(var/things in H.friends)
 				if(capsuleowner in H.friends)
 					if(insert(AM, user) == -1) //Limit reached
@@ -839,7 +852,8 @@ proc/move_mining_shuttle()
 		else
 			for(M in L)
 				var/turf/T = get_turf(M)
-				var/image/I = image('icons/turf/walls.dmi', loc = T, icon_state = M.scan_state, layer = 18)
+				var/image/I = image('icons/turf/walls.dmi', loc = T, icon_state = M.scan_state, layer = UNDER_HUD_LAYER)
+				I.plane = HUD_PLANE
 				C.images += I
 				spawn(30)
 					if(C)

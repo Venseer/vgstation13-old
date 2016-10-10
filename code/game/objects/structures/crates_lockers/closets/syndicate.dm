@@ -22,7 +22,7 @@
 	new /obj/item/weapon/card/id/syndicate(src)
 	new /obj/item/device/multitool(src)
 	new /obj/item/weapon/shield/energy(src)
-	new /obj/item/clothing/shoes/magboots(src)
+	new /obj/item/clothing/shoes/magboots/syndie(src)
 
 
 /obj/structure/closet/syndicate/nuclear
@@ -31,11 +31,11 @@
 /obj/structure/closet/syndicate/nuclear/New()
 	..()
 	sleep(2)
-	new /obj/item/ammo_storage/magazine/a12mm(src)
-	new /obj/item/ammo_storage/magazine/a12mm(src)
-	new /obj/item/ammo_storage/magazine/a12mm(src)
-	new /obj/item/ammo_storage/magazine/a12mm(src)
-	new /obj/item/ammo_storage/magazine/a12mm(src)
+	new /obj/item/ammo_storage/magazine/a12mm/ops(src)
+	new /obj/item/ammo_storage/magazine/a12mm/ops(src)
+	new /obj/item/ammo_storage/magazine/a12mm/ops(src)
+	new /obj/item/ammo_storage/magazine/a12mm/ops(src)
+	new /obj/item/ammo_storage/magazine/a12mm/ops(src)
 	new /obj/item/weapon/storage/box/handcuffs(src)
 	new /obj/item/weapon/storage/box/flashbangs(src)
 	new /obj/item/weapon/storage/box/emps(src)

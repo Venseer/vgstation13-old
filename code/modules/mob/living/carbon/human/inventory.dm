@@ -113,7 +113,7 @@
 			qdel(W)
 			W = null
 		if(EQUIP_FAILACTION_DROP)
-			W.loc=get_turf(src) // I think.
+			W.forceMove(get_turf(src)) // I think.
 	return null
 
 /mob/living/carbon/human/proc/is_on_ears(var/typepath)
@@ -206,7 +206,8 @@
 			return 1
 
 /mob/living/carbon/human/u_equip(obj/item/W as obj, dropped = 1)
-	if(!W)	return 0
+	if(!W)
+		return 0
 
 	var/success
 
@@ -304,13 +305,12 @@
 		if (W)
 			if (client)
 				client.screen -= W
-			W.forceMove(loc)
 			W.unequipped()
 			if(dropped)
+				W.forceMove(loc)
 				W.dropped(src)
 			if(W)
-				W.layer = initial(W.layer)
-				W.plane = initial(W.plane)
+				W.reset_plane_and_layer()
 	update_action_buttons()
 	return 1
 
@@ -369,12 +369,15 @@
 //This is an UNSAFE proc. Use mob_can_equip() before calling this one! Or rather use equip_to_slot_if_possible() or advanced_equip_to_slot_if_possible()
 //set redraw_mob to 0 if you don't wish the hud to be updated - if you're doing it manually in your own proc.
 /mob/living/carbon/human/equip_to_slot(obj/item/W as obj, slot, redraw_mob = 1)
-	if(!slot) return
-	if(!istype(W)) return
-	if(!has_organ_for_slot(slot)) return
+	if(!slot)
+		return
+	if(!istype(W))
+		return
+	if(!has_organ_for_slot(slot))
+		return
 
 	if(src.is_holding_item(W))
-		src.u_equip(W)
+		src.u_equip(W, 0)
 
 	switch(slot)
 		if(slot_back)
@@ -433,7 +436,7 @@
 		if(slot_in_backpack)
 			if(src.get_active_hand() == W)
 				src.u_equip(W,0)
-			W.loc = src.back
+			W.forceMove(src.back)
 			return
 		else
 			to_chat(src, "<span class='warning'>You are trying to equip this item to an unsupported inventory slot. Report this to a coder!</span>")
@@ -441,11 +444,11 @@
 
 	update_hidden_item_icons(W)
 
-	W.layer = 20
-	W.plane = PLANE_HUD
+	W.hud_layerise()
 	W.equipped(src, slot)
 	W.forceMove(src)
-	if(client) client.screen |= W
+	if(client)
+		client.screen |= W
 
 /mob/living/carbon/human/get_multitool(var/active_only=0)
 	if(istype(get_active_hand(),/obj/item/device/multitool))

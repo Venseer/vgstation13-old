@@ -7,7 +7,7 @@
 	siemens_coefficient = 1
 	w_class = W_CLASS_MEDIUM
 	force = 9.0
-	throwforce = 15.0
+	throwforce = 5
 	throw_speed = 5
 	throw_range = 20
 	starting_materials = list(MAT_IRON = 1875)
@@ -81,7 +81,8 @@
 /obj/item/stack/rods/attack_self(mob/user as mob)
 	src.add_fingerprint(user)
 
-	if(!istype(user.loc, /turf)) return 0
+	if(!istype(user.loc, /turf))
+		return 0
 
 	if(locate(/obj/structure/grille, user.loc))
 		for(var/obj/structure/grille/G in user.loc)

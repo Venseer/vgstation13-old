@@ -5,8 +5,10 @@
 	message_admins("[key_name_admin(usr, 1)] summoned [summon_type ? "magic" : "guns"]!")
 	log_game("[key_name(usr)] summoned [summon_type ? "magic" : "guns"]!")
 	for(var/mob/living/carbon/human/H in player_list)
-		if(H.stat == DEAD || !(H.client)) continue
-		if(is_special_character(H)) continue
+		if(H.stat == DEAD || !(H.client))
+			continue
+		if(is_special_character(H))
+			continue
 		if(prob(35) && !(H.mind in ticker.mode.traitors))
 			ticker.mode.traitors += H.mind
 			H.mind.special_role = "traitor"
@@ -47,7 +49,7 @@
 					new /obj/item/weapon/gun/projectile/pistol(get_turf(H))
 					new /obj/item/gun_part/silencer(get_turf(H))
 				if("cannon")
-					new /obj/item/weapon/gun/energy/lasercannon(get_turf(H))
+					new /obj/item/weapon/gun/energy/laser/cannon(get_turf(H))
 				if("doublebarrel")
 					new /obj/item/weapon/gun/projectile/shotgun/pump/(get_turf(H))
 				if("shotgun")
@@ -127,7 +129,7 @@
 					new /obj/item/weapon/scrying(get_turf(H))
 					if (!(M_XRAY in H.mutations))
 						H.mutations.Add(M_XRAY)
-						H.sight |= (SEE_MOBS|SEE_OBJS|SEE_TURFS)
+						H.change_sight(adding = SEE_MOBS|SEE_OBJS|SEE_TURFS)
 						H.see_in_dark = 8
 						H.see_invisible = SEE_INVISIBLE_LEVEL_TWO
 						to_chat(H, "<span class='notice'>The walls suddenly disappear.</span>")

@@ -2,6 +2,8 @@
 
 #define VOX_SHAPED "Vox","Skeletal Vox"
 
+#define GREY_SHAPED "Grey"
+
 //Content of the Round End Information window
 var/round_end_info = ""
 
@@ -46,80 +48,6 @@ var/list/paper_blacklist = list("java","onblur","onchange","onclick","ondblclick
 	"onkeypress","onkeyup","onload","onmousedown","onmousemove","onmouseout","onmouseover",	\
 	"onmouseup","onreset","onselect","onsubmit","onunload")
 
-var/BLINDBLOCK = 0
-var/DEAFBLOCK = 0
-var/HULKBLOCK = 0
-var/TELEBLOCK = 0
-var/FIREBLOCK = 0
-var/XRAYBLOCK = 0
-var/CLUMSYBLOCK = 0
-var/FAKEBLOCK = 0
-var/COUGHBLOCK = 0
-var/GLASSESBLOCK = 0
-var/EPILEPSYBLOCK = 0
-var/TWITCHBLOCK = 0
-var/NERVOUSBLOCK = 0
-var/MONKEYBLOCK = DNA_SE_LENGTH
-
-var/BLOCKADD = 0
-var/DIFFMUT = 0
-
-var/HEADACHEBLOCK = 0
-var/NOBREATHBLOCK = 0
-var/REMOTEVIEWBLOCK = 0
-var/REGENERATEBLOCK = 0
-var/INCREASERUNBLOCK = 0
-var/REMOTETALKBLOCK = 0
-var/MORPHBLOCK = 0
-var/COLDBLOCK = 0
-var/HALLUCINATIONBLOCK = 0
-var/NOPRINTSBLOCK = 0
-var/SHOCKIMMUNITYBLOCK = 0
-var/SMALLSIZEBLOCK = 0
-
-///////////////////////////////
-// Goon Stuff
-///////////////////////////////
-// Disabilities
-var/LISPBLOCK = 0
-var/MUTEBLOCK = 0
-var/RADBLOCK = 0
-var/FATBLOCK = 0
-var/CHAVBLOCK = 0
-var/SWEDEBLOCK = 0
-var/SCRAMBLEBLOCK = 0
-var/TOXICFARTBLOCK = 0
-var/STRONGBLOCK = 0
-var/HORNSBLOCK = 0
-var/SMILEBLOCK = 0
-var/ELVISBLOCK = 0
-
-// Powers
-var/SOBERBLOCK = 0
-var/PSYRESISTBLOCK = 0
-//var/SHADOWBLOCK = 0
-var/FARSIGHTBLOCK = 0
-var/CHAMELEONBLOCK = 0
-var/CRYOBLOCK = 0
-var/EATBLOCK = 0
-var/JUMPBLOCK = 0
-var/MELTBLOCK = 0
-var/EMPATHBLOCK = 0
-var/SUPERFARTBLOCK = 0
-var/IMMOLATEBLOCK = 0
-var/POLYMORPHBLOCK = 0
-
-///////////////////////////////
-// /vg/ Mutations
-///////////////////////////////
-var/LOUDBLOCK = 0
-var/WHISPERBLOCK = 0
-var/DIZZYBLOCK = 0
-var/SANSBLOCK = 0
-var/NOIRBLOCK = 0
-
-
-
 
 var/skipupdate = 0
 	///////////////
@@ -140,12 +68,10 @@ var/game_version = "veegee"
 var/changelog_hash = ""
 var/game_year = (text2num(time2text(world.realtime, "YYYY")) + 544)
 
-var/datum/air_tunnel/air_tunnel1/SS13_airtunnel = null
 var/going = 1.0
 var/master_mode = "extended"//"extended"
 var/secret_force_mode = "secret" // if this is anything but "secret", the secret rotation will forceably choose this mode
 
-var/datum/engine_eject/engine_eject_control = null
 var/host = null
 var/aliens_allowed = 1
 var/ooc_allowed = 1
@@ -179,7 +105,7 @@ var/CHARGELEVEL = 0.001 // Cap for how fast cells charge, as a percentage-per-ti
 var/list/WORLD_X_OFFSET = list()
 var/list/WORLD_Y_OFFSET = list()
 
-var/shuttle_z = 2	//default
+var/shuttle_z = map.zCentcomm	//default
 var/airtunnel_start = 68 // default
 var/airtunnel_stop = 68 // default
 var/airtunnel_bottom = 72 // default
@@ -291,8 +217,8 @@ var/custom_event_msg = null
 
 //Database connections
 //A connection is established on world creation. Ideally, the connection dies when the server restarts (After feedback logging.).
-var/DBConnection/dbcon = new()	//Feedback database (New database)
-var/DBConnection/dbcon_old = new()	//Tgstation database (Old database) - See the files in the SQL folder for information what goes where.
+var/DBConnection/dbcon	//Feedback database (New database)
+var/DBConnection/dbcon_old	//Tgstation database (Old database) - See the files in the SQL folder for information what goes where.
 
 #define MIDNIGHT_ROLLOVER		864000	//number of deciseconds in a day
 
@@ -418,7 +344,9 @@ var/adminblob_beat = 'sound/effects/blob_pulse.ogg'
 #define DEPARTMENT_START_WAGE 500
 #define PLAYER_START_WAGE 50
 
-//SPACE PARALLAX
-var/parallax_initialized = 0
-var/space_color = "#050505"
-var/list/parallax_icon[27]
+//HUD MINIMAPS
+var/list/holoMiniMaps = list()
+var/list/centcommMiniMaps = list()
+var/list/extraMiniMaps = list()
+
+var/holomaps_initialized = 0

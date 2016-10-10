@@ -14,7 +14,7 @@
 	throw_speed = 4
 	throw_range = 5
 	force = 5.0
-	origin_tech = "combat=1"
+	origin_tech = Tc_COMBAT + "=1"
 	attack_verb = list("strikes", "hits", "bashes")
 	mech_flags = MECH_SCAN_ILLEGAL
 	min_harm_label = 20
@@ -48,6 +48,7 @@
 	var/last_fired = 0
 
 	var/conventional_firearm = 1	//Used to determine whether, when examined, an /obj/item/weapon/gun/projectile will display the amount of rounds remaining.
+	var/jammed = 0
 
 /obj/item/weapon/gun/proc/ready_to_fire()
 	if(world.time >= last_fired + fire_delay)
@@ -62,17 +63,22 @@
 /obj/item/weapon/gun/proc/special_check(var/mob/M) //Placeholder for any special checks, like detective's revolver.
 	return 1
 
+/obj/item/weapon/gun/proc/failure_check(var/mob/M) //special_check, but in a different place
+	return 1
+
 /obj/item/weapon/gun/emp_act(severity)
 	for(var/obj/O in contents)
 		O.emp_act(severity)
 
 /obj/item/weapon/gun/afterattack(atom/A as mob|obj|turf|area, mob/living/user as mob|obj, flag, params, struggle = 0)
-	if(flag)	return //we're placing gun on a table or in backpack
+	if(flag)
+		return //we're placing gun on a table or in backpack
 	if(harm_labeled >= min_harm_label)
 		to_chat(user, "<span class='warning'>A label sticks the trigger to the trigger guard!</span>")//Such a new feature, the player might not know what's wrong if it doesn't tell them.
 
 		return
-	if(istype(target, /obj/machinery/recharger) && istype(src, /obj/item/weapon/gun/energy))	return//Shouldnt flag take care of this?
+	if(istype(target, /obj/machinery/recharger) && istype(src, /obj/item/weapon/gun/energy))
+		return//Shouldnt flag take care of this?
 	if(user && user.client && user.client.gun_mode && !(A in target))
 		PreFire(A,user,params, "struggle" = struggle) //They're using the new gun system, locate what they're aiming at.
 	else
@@ -134,11 +140,16 @@
 		return
 
 	add_fingerprint(user)
+	var/atom/originaltarget = target
 
 	var/turf/curloc = user.loc
 	var/turf/targloc = get_turf(target)
 	if (!istype(targloc) || !istype(curloc))
 		return
+
+	if(defective)
+		target = get_inaccuracy(originaltarget, 1+recoil)
+		targloc = get_turf(target)
 
 	if(!special_check(user))
 		return
@@ -148,13 +159,16 @@
 			to_chat(user, "<span class='warning'>[src] is not ready to fire again!")
 		return
 
-	if(!process_chambered()) //CHECK
+	if(!process_chambered() || jammed) //CHECK
 		return click_empty(user)
 
 	if(!in_chamber)
 		return
+	if(defective)
+		if(!failure_check(user))
+			return
 	if(!istype(src, /obj/item/weapon/gun/energy/laser/redtag) && !istype(src, /obj/item/weapon/gun/energy/laser/bluetag))
-		log_attack("[user.name] ([user.ckey]) fired \the [src] (proj:[in_chamber.name]) at [target] [ismob(target) ? "([target:ckey])" : ""] ([target.x],[target.y],[target.z])[struggle ? " due to being disarmed." :""]" )
+		log_attack("[user.name] ([user.ckey]) fired \the [src] (proj:[in_chamber.name]) at [originaltarget] [ismob(target) ? "([originaltarget:ckey])" : ""] ([originaltarget.x],[originaltarget.y],[originaltarget.z])[struggle ? " due to being disarmed." :""]" )
 	in_chamber.firer = user
 
 	if(user.zone_sel)
@@ -194,9 +208,8 @@
 				B.Move(get_step(user,movementdirection), movementdirection)
 				sleep(3)
 				B.Move(get_step(user,movementdirection), movementdirection)
-		if((istype(user.loc, /turf/space)) || (user.areaMaster.has_gravity == 0))
-			user.inertia_dir = get_dir(target, user)
-			step(user, user.inertia_dir)
+
+		user.apply_inertia(get_dir(target, user))
 
 	if(silenced)
 		if(fire_sound)
@@ -213,7 +226,7 @@
 		"You hear a [istype(in_chamber, /obj/item/projectile/beam) ? "laser blast" : "gunshot"]!")
 
 	in_chamber.original = target
-	in_chamber.loc = get_turf(user)
+	in_chamber.forceMove(get_turf(user))
 	in_chamber.starting = get_turf(user)
 	in_chamber.shot_from = src
 	user.delayNextAttack(4) // TODO: Should be delayed per-gun.
@@ -240,6 +253,13 @@
 	update_icon()
 
 	user.update_inv_hand(user.active_hand)
+
+	if(defective && recoil && prob(3))
+		var/throwturf = get_ranged_target_turf(user, pick(alldirs), 7)
+		user.drop_item()
+		user.visible_message("\The [src] jumps out of [user]'s hands!","\The [src] jumps out of your hands!")
+		throw_at(throwturf, rand(3, 6), 3)
+		return 1
 
 	return 1
 

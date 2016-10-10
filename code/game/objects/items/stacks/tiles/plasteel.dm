@@ -8,7 +8,7 @@
 	starting_materials = list(MAT_IRON = 937.5)
 	w_type = RECYK_METAL
 	melt_temperature = MELTPOINT_STEEL
-	throwforce = 15.0
+	throwforce = 5
 	throw_speed = 5
 	throw_range = 20
 	flags = FPRINT
@@ -19,8 +19,8 @@
 
 /obj/item/stack/tile/plasteel/New(var/loc, var/amount=null)
 	. = ..()
-	pixel_x = rand(1, 14)
-	pixel_y = rand(1, 14)
+	pixel_x = rand(1, 14) * PIXEL_MULTIPLIER
+	pixel_y = rand(1, 14) * PIXEL_MULTIPLIER
 
 /*
 /obj/item/stack/tile/plasteel/attack_self(mob/user as mob)

@@ -13,7 +13,7 @@
 	icon = 'icons/obj/structures.dmi'
 	icon_state = "window"
 	density = 1
-	layer = 3.2 //Just above airlocks //For some reason I guess
+	layer = SIDE_WINDOW_LAYER
 	pressure_resistance = 4*ONE_ATMOSPHERE
 	anchored = 1
 	var/health = 10 //This window is so bad blowing on it would break it, sucks for it
@@ -45,8 +45,10 @@
 	return PROJREACT_WINDOWS
 
 /obj/structure/window/examine(mob/user)
-
 	..()
+	examine_health(user)
+
+/obj/structure/window/proc/examine_health(mob/user)
 	if(!anchored)
 		to_chat(user, "It appears to be completely loose and movable.")
 	//switch most likely can't take inequalities, so here's that if block
@@ -153,7 +155,8 @@
 			if(get_dir(loc, target) == dir)
 				return !density
 		else if(mover.dir == dir) //Or are we using move code
-			if(density)	mover.Bump(src)
+			if(density)
+				mover.Bump(src)
 			return !density
 	return 1
 
@@ -516,6 +519,10 @@
 	d_state = WINDOWSECURE
 	reinforced = 1
 	penetration_dampening = 3
+
+/obj/structure/window/reinforced/loose
+	anchored = 0
+	d_state = WINDOWLOOSE
 
 /obj/structure/window/plasma
 

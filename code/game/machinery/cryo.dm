@@ -11,8 +11,8 @@ var/global/list/cryo_health_indicator = list(	"full" = image("icon" = 'icons/obj
 	icon_state = "cell-off"
 	density = 1
 	anchored = 1.0
-	layer = 2.8
-	plane = PLANE_OBJ
+	layer = ABOVE_WINDOW_LAYER
+	plane = OBJ_PLANE
 
 	var/on = 0
 	var/ejecting = 0
@@ -52,7 +52,8 @@ var/global/list/cryo_health_indicator = list(	"full" = image("icon" = 'icons/obj
 		node.build_network()
 
 /obj/machinery/atmospherics/unary/cryo_cell/initialize()
-	if(node) return
+	if(node)
+		return
 	for(var/cdir in cardinal)
 		node = findConnecting(cdir)
 		if(node)
@@ -166,15 +167,20 @@ var/global/list/cryo_health_indicator = list(	"full" = image("icon" = 'icons/obj
 
 
 /obj/machinery/atmospherics/unary/cryo_cell/relaymove(mob/user as mob)
+	// Just gonna assume this guy's vent crawling don't mind me.
+	if (user != occupant)
+		return ..()
+
 	if(user.stat)
 		return
+
 	go_out()
-	return
+
 
 /obj/machinery/atmospherics/unary/cryo_cell/examine(mob/user)
 	..()
 	if(Adjacent(user))
-		if(contents)
+		if(contents.len)
 			to_chat(user, "You can just about make out some properties of the cryo's murky depths:")
 			for(var/atom/movable/floater in (contents - beaker))
 				to_chat(user, "A figure floats in the depths, they appear to be [floater.name]")
@@ -276,7 +282,8 @@ var/global/list/cryo_health_indicator = list(	"full" = image("icon" = 'icons/obj
 		return 0 // don't update UIs attached to this object
 
 	if(href_list["close"])
-		if(usr.machine == src) usr.unset_machine()
+		if(usr.machine == src)
+			usr.unset_machine()
 		return 1
 
 	if(href_list["switchOn"])
@@ -300,13 +307,13 @@ var/global/list/cryo_health_indicator = list(	"full" = image("icon" = 'icons/obj
 	return 1 // update UIs attached to this object
 /obj/machinery/atmospherics/unary/cryo_cell/proc/detach()
 	if(beaker)
-		beaker.loc = get_step(loc, SOUTH)
+		beaker.forceMove(get_step(loc, SOUTH))
 		if(istype(beaker, /obj/item/weapon/reagent_containers/glass/beaker/large/cyborg))
 			var/mob/living/silicon/robot/R = beaker:holder:loc
 			if(R.module_state_1 == beaker || R.module_state_2 == beaker || R.module_state_3 == beaker)
-				beaker.loc = R
+				beaker.forceMove(R)
 			else
-				beaker.loc = beaker:holder
+				beaker.forceMove(beaker:holder)
 		beaker = null
 
 /obj/machinery/atmospherics/unary/cryo_cell/crowbarDestroy(mob/user)
@@ -398,7 +405,8 @@ var/global/list/cryo_health_indicator = list(	"full" = image("icon" = 'icons/obj
 			if(istype(guy) && guy.species && guy.species.breath_type != "oxygen")
 				occupant.nobreath = 15 //Prevent them from suffocating until someone can get them internals. Also prevents plasmamen from combusting.
 			if(air_contents.oxygen > 2)
-				if(occupant.getOxyLoss()) occupant.adjustOxyLoss(-1)
+				if(occupant.getOxyLoss())
+					occupant.adjustOxyLoss(-1)
 			else
 				occupant.adjustOxyLoss(-1)
 			//severe damage should heal waaay slower without proper chemicals
@@ -498,7 +506,7 @@ var/global/list/cryo_health_indicator = list(	"full" = image("icon" = 'icons/obj
 	if(usr.pulling == M)
 		usr.stop_pulling()
 	M.stop_pulling()
-	M.loc = src
+	M.forceMove(src)
 	M.reset_view()
 	if(M.health > -100 && (M.health < 0 || M.sleeping))
 		to_chat(M, "<span class='bnotice'>You feel a cold liquid surround you. Your skin starts to freeze up.</span>")
@@ -544,6 +552,8 @@ var/global/list/cryo_health_indicator = list(	"full" = image("icon" = 'icons/obj
 	put_mob(usr)
 	return
 
+/obj/machinery/atmospherics/unary/cryo_cell/return_air()
+	return air_contents
 
 
 /datum/data/function/proc/reset()

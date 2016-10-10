@@ -13,7 +13,7 @@
 	w_type = RECYK_WOOD
 	throw_range = 1
 	throw_speed = 1
-	layer = 3.9
+	layer = ABOVE_DOOR_LAYER
 	pressure_resistance = 1
 	attack_verb = list("slaps")
 	autoignition_temperature = AUTOIGNITION_PAPER
@@ -34,8 +34,8 @@
 
 /obj/item/weapon/paper/New()
 	..()
-	pixel_y = rand(-8, 8)
-	pixel_x = rand(-9, 9)
+	pixel_y = rand(-8, 8) * PIXEL_MULTIPLIER
+	pixel_x = rand(-9, 9) * PIXEL_MULTIPLIER
 	spawn(2)
 		update_icon()
 		updateinfolinks()
@@ -47,7 +47,7 @@
 		icon_state += "_words"
 
 /obj/item/weapon/paper/examine(mob/user)
-	if(in_range(user, src))
+	if(user.range_check(src))
 		var/info_2 = ""
 		if(img)
 			user << browse_rsc(img.img, "tmp_photo.png")
@@ -61,6 +61,17 @@
 	else
 		..() //Only show a regular description if it is too far away to read.
 		to_chat(user, "<span class='notice'>It is too far away to read.</span>")
+
+/mob/proc/range_check(paper)
+	return Adjacent(paper)
+
+/mob/dead/range_check(paper)
+	return 1
+
+/mob/living/silicon/ai/range_check(paper)
+	if(ai_flags & HIGHRESCAMS)
+		return 1
+	return ..()
 
 /obj/item/weapon/paper/verb/rename()
 	set name = "Rename paper"
@@ -271,6 +282,10 @@
 
 			update_icon()
 
+			if(istype(loc, /obj/item/weapon/clipboard))
+				var/obj/item/weapon/clipboard/C = loc
+				C.update_icon()
+
 	if(href_list["help"])
 		openhelp(usr)
 
@@ -299,8 +314,8 @@
 		stamps += (stamps=="" ? "<HR>" : "<BR>") + "<i>This [src.name] has been stamped with the [P.name].</i>"
 
 		var/image/stampoverlay = image('icons/obj/bureaucracy.dmi')
-		stampoverlay.pixel_x = rand(-2, 2)
-		stampoverlay.pixel_y = rand(-3, 2)
+		stampoverlay.pixel_x = rand(-2, 2) * PIXEL_MULTIPLIER
+		stampoverlay.pixel_y = rand(-3, 2) * PIXEL_MULTIPLIER
 		stampoverlay.icon_state = "paper_[P.icon_state]"
 
 		if(!stamped)

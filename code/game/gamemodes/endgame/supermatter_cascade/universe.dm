@@ -73,7 +73,8 @@
 	tcheck(80,1)
 	if(!endgame_exits.len)
 		message_admins("<span class='warning'><font size=7>SOMEBODY DIDNT PUT ENDGAME EXITS FOR THIS FUCKING MAP: [map.nameLong]</span></font>")
-	else new /obj/machinery/singularity/narsie/large/exit(pick(endgame_exits))
+	else
+		new /obj/machinery/singularity/narsie/large/exit(pick(endgame_exits))
 	spawn(rand(30,60) SECONDS)
 		command_alert(/datum/command_alert/supermatter_cascade)
 
@@ -139,7 +140,8 @@
 	var/count = 0
 	for(var/turf/T in turfs)
 		count++
-		if(!(count % 50000)) sleep(world.tick_lag)
+		if(!(count % 50000))
+			sleep(world.tick_lag)
 		if(istype(T, /turf/space))
 			T.overlays += image(icon = T.icon, icon_state = "end01")
 		else
@@ -224,7 +226,7 @@
 				cult.memoize_cult_objectives(M)
 			to_chat(M.current, "<span class='danger'><FONT size = 3>Nar-Sie loses interest in this plane. You are no longer a cultist.</FONT></span>")
 			to_chat(M.current, "<span class='danger'>You find yourself unable to mouth the words of the forgotten...</span>")
-			M.current.remove_language("Cult")
+			M.current.remove_language(LANGUAGE_CULT)
 			M.memory = ""
 
 		if(M in ticker.mode.wizards)
@@ -232,6 +234,13 @@
 			M.special_role = null
 			M.current.spellremove(M.current, config.feature_object_spell_system? "object":"verb")
 			to_chat(M.current, "<span class='danger'><FONT size = 3>Your powers ebb and you feel weak. You are no longer a wizard.</FONT></span>")
+			ticker.mode.update_wizard_icons_removed(M)
+
+		if(M in ticker.mode.apprentices)
+			ticker.mode.apprentices -= M
+			M.special_role = null
+			M.current.spellremove(M.current, config.feature_object_spell_system? "object":"verb")
+			to_chat(M.current, "<span class='danger'><FONT size = 3>What little magic you have leaves you. You are no longer a wizard's apprentice.</FONT></span>")
 			ticker.mode.update_wizard_icons_removed(M)
 
 		if(M in ticker.mode.changelings)

@@ -114,7 +114,8 @@
 	var/counter
 	for(counter=0, counter<2, counter++)
 		var/obj/item/weapon/ore/diamond/D = new /obj/item/weapon/ore/diamond(src.loc)
-		D.layer = 4.1
+		D.plane = plane
+		D.layer = layer + 0.001
 	..()
 
 /mob/living/simple_animal/hostile/asteroid/goldgrub
@@ -376,10 +377,12 @@
 
 	size = SIZE_BIG
 
-/mob/living/simple_animal/hostile/asteroid/goliath/OpenFire()
-	visible_message("<span class='warning'>The [src.name] digs its tentacles under [target.name]!</span>")
+/mob/living/simple_animal/hostile/asteroid/goliath/OpenFire(atom/ttarget)
+	if(istype(ttarget))
+		visible_message("<span class='warning'>\The [src] digs its tentacles under \the [ttarget]!</span>")
+
 	playsound(loc, 'sound/weapons/whip.ogg', 50, 1, -1)
-	var/tturf = get_turf(target)
+	var/tturf = get_turf(ttarget)
 	new /obj/effect/goliath_tentacle/original(tturf)
 	ranged_cooldown = ranged_cooldown_cap
 	return
@@ -433,7 +436,6 @@
 	icon = 'icons/obj/items.dmi'
 	icon_state = "goliath_hide"
 	w_class = W_CLASS_MEDIUM
-	layer = 4
 
 /obj/item/asteroid/goliath_hide/afterattack(atom/target, mob/user, proximity_flag)
 	if(proximity_flag)

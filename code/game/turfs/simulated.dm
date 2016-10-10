@@ -11,6 +11,7 @@
 	var/max_fire_temperature_sustained = 0 //The max temperature of the fire which it was subjected to
 	var/drying = 0 // tracking if something is currently drying
 	var/can_exist_under_lattice = 0 //If 1, RemoveLattice() is not called when a turf is changed to this.
+
 /turf/simulated/New()
 	..()
 
@@ -32,7 +33,8 @@
 
 	if (istype(A,/mob/living/carbon))
 		var/mob/living/carbon/M = A
-		if(M.lying)	return
+		if(M.lying)
+			return
 		if(istype(M, /mob/living/carbon/human))
 			var/mob/living/carbon/human/H = M
 

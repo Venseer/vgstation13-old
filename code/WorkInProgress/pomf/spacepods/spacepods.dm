@@ -9,8 +9,7 @@
 	density = 1 //Dense. To raise the heat.
 	opacity = 0
 	anchored = 1
-	unacidable = 1
-	layer = 3.9
+	layer = ABOVE_DOOR_LAYER
 	infra_luminosity = 15
 	internal_gravity = 1 // Can move in 0-gravity
 	var/mob/living/carbon/occupant
@@ -22,7 +21,6 @@
 	var/use_internal_tank = 0
 	var/datum/global_iterator/pr_int_temp_processor //normalizes internal air mixture temperature
 	var/datum/global_iterator/pr_give_air //moves air from tank to cabin
-	var/inertia_dir = 0
 	var/hatch_open = 0
 	var/next_firetime = 0
 	var/list/pod_overlays
@@ -35,8 +33,8 @@
 		pod_overlays = new/list(2)
 		pod_overlays[DAMAGE] = image(icon, icon_state="pod_damage")
 		pod_overlays[FIRE] = image(icon, icon_state="pod_fire")
-	bound_width = 64
-	bound_height = 64
+	bound_width = 2*WORLD_ICON_SIZE
+	bound_height = 2*WORLD_ICON_SIZE
 	dir = EAST
 	battery = new /obj/item/weapon/cell/high()
 	add_cabin()
@@ -51,7 +49,7 @@
 
 /obj/spacepod/Destroy()
 	if(src.occupant)
-		src.occupant.loc = src.loc
+		src.occupant.forceMove(src.loc)
 		src.occupant.gib()
 		src.occupant = null
 	..()
@@ -109,7 +107,7 @@
 		if(1)
 			var/mob/living/carbon/human/H = occupant
 			if(H)
-				H.loc = get_turf(src)
+				H.forceMove(get_turf(src))
 				H.ex_act(severity + 1)
 				to_chat(H, "<span class='warning'>You are forcefully thrown from \the [src]!</span>")
 			del(ion_trail)
@@ -430,7 +428,7 @@
 	. = ..()
 	if(dir && (oldloc != NewLoc))
 		src.loc.Entered(src, oldloc)
-/obj/spacepod/proc/Process_Spacemove(var/check_drift = 0, mob/user)
+/obj/spacepod/Process_Spacemove(var/check_drift = 0, mob/user)
 	var/dense_object = 0
 	if(!user)
 		for(var/direction in list(NORTH, NORTHEAST, EAST))
@@ -448,23 +446,11 @@
 	var/moveship = 1
 	if(battery && battery.charge >= 3 && health)
 		src.dir = direction
-		switch(direction)
-			if(1)
-				if(inertia_dir == 2)
-					inertia_dir = 0
-					moveship = 0
-			if(2)
-				if(inertia_dir == 1)
-					inertia_dir = 0
-					moveship = 0
-			if(4)
-				if(inertia_dir == 8)
-					inertia_dir = 0
-					moveship = 0
-			if(8)
-				if(inertia_dir == 4)
-					inertia_dir = 0
-					moveship = 0
+
+		if(inertia_dir == turn(direction, 180))
+			inertia_dir = 0
+			moveship = 0
+
 		if(moveship)
 			Move(get_step(src,direction), direction)
 			if(istype(src.loc, /turf/space))
@@ -480,6 +466,21 @@
 			to_chat(user, "<span class='warning'>Unknown error has occurred, yell at pomf.</span>")
 		return 0
 	battery.charge = max(0, battery.charge - 3)
+
+/obj/spacepod/process_inertia(turf/start)
+	set waitfor = 0
+
+	if(Process_Spacemove(1))
+		inertia_dir = 0
+		return
+
+	sleep(5)
+
+	if(loc == start)
+		if(inertia_dir)
+			Move(get_step(src, inertia_dir), inertia_dir)
+			return
+
 
 /obj/effect/landmark/spacepod/random //One of these will be chosen from across all Z levels to receive a pod in gameticker.dm
 	name = "spacepod spawner"
@@ -502,6 +503,9 @@
 	sleep(10)
 	new /obj/spacepod/random(get_turf(src))
 	qdel(src)
+
+/obj/spacepod/acidable()
+	return 0
 
 #undef DAMAGE
 #undef FIRE

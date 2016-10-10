@@ -27,7 +27,6 @@
 
 /obj/effect/beam
 	name = "beam"
-	unacidable = 1//Just to be sure.
 	anchored = 1
 	density = 0
 
@@ -121,7 +120,8 @@
 	beam_testing("Bumped by [AM]")
 	am_connector=1
 	var/obj/effect/beam/OB = master
-	if(!OB) OB = src
+	if(!OB)
+		OB = src
 	src._re_emit = 0
 	qdel(src)
 	OB.connect_to(AM)
@@ -206,7 +206,8 @@
 	beam_testing(" Connecting!")
 	am_connector=1
 	var/obj/effect/beam/OB = master
-	if(!OB) OB = src
+	if(!OB)
+		OB = src
 	src._re_emit = 0
 	qdel(src)
 	OB.connect_to(AM)

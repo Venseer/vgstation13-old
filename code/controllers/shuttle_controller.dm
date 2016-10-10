@@ -38,7 +38,8 @@ datum/shuttle_controller
 	// otherwise if outgoing, switch to incoming
 
 datum/shuttle_controller/proc/incall(coeff = 1)
-	if(shutdown) return
+	if(shutdown)
+		return
 	if((!universe.OnShuttleCall(null) || deny_shuttle) && alert == 1) //crew transfer shuttle does not gets recalled by gamemode
 		return
 	if(endtime)
@@ -56,7 +57,8 @@ datum/shuttle_controller/proc/incall(coeff = 1)
 				A.readyalert()
 
 datum/shuttle_controller/proc/shuttlealert(var/X)
-	if(shutdown) return
+	if(shutdown)
+		return
 	alert = X
 
 
@@ -67,8 +69,10 @@ datum/shuttle_controller/proc/force_shutdown()
 
 
 datum/shuttle_controller/proc/recall()
-	if(shutdown) return
-	if(!can_recall)	return
+	if(shutdown)
+		return
+	if(!can_recall)
+		return
 	if(direction == 1)
 		var/timeleft = timeleft()
 		if(alert == 0)
@@ -243,6 +247,7 @@ datum/shuttle_controller/emergency_shuttle/process()
 
 				settimeleft(SHUTTLELEAVETIME)
 				send2mainirc("The Emergency Shuttle has docked with the station.")
+				send2maindiscord("The **Emergency Shuttle** has docked with the station.")
 				captain_announce("The Emergency Shuttle has docked with the station. You have [round(timeleft()/60,1)] minutes to board the Emergency Shuttle.")
 				world << sound('sound/AI/shuttledock.ogg')
 
@@ -308,8 +313,8 @@ datum/shuttle_controller/emergency_shuttle/process()
 					for(var/client/C in clients)
 						spawn
 							vote.interface.sendAssets(C)
-					
-				
+
+
 				return 1
 
 		else
@@ -330,8 +335,8 @@ datum/shuttle_controller/emergency_shuttle/process()
 
 /obj/effect/bgstar/New()
 	. = ..()
-	pixel_x += rand(-2, 30)
-	pixel_y += rand(-2, 30)
+	pixel_x += rand(-2, 30) * PIXEL_MULTIPLIER
+	pixel_y += rand(-2, 30) * PIXEL_MULTIPLIER
 	icon_state = "star" + pick("1", "1", "1", "2", "3", "4")
 	speed = rand(2, 5)
 
@@ -362,4 +367,3 @@ datum/shuttle_controller/emergency_shuttle/process()
 			S.direction = spawndir
 			spawn()
 				S.startmove()
-

@@ -110,11 +110,12 @@
 
 	//High brute damage or sharp objects may damage internal organs
 	if(internal_organs != null)
-		if((sharp && brute >= 5) || brute >= 10) if(prob(5))
-			//Damage an internal organ
-			var/datum/organ/internal/I = pick(internal_organs)
-			I.take_damage(brute / 2)
-			brute -= brute / 2
+		if((sharp && brute >= 5) || brute >= 10)
+			if(prob(5))
+				//Damage an internal organ
+				var/datum/organ/internal/I = pick(internal_organs)
+				I.take_damage(brute / 2)
+				brute -= brute / 2
 
 	if(is_broken() && prob(40) && brute)
 		owner.emote("scream", , , 1) //Getting hit on broken and unsplinted limbs hurts
@@ -227,7 +228,7 @@
 	//Remove embedded objects and drop them on the floor
 	for(var/obj/implanted_object in implants)
 		if(!istype(implanted_object,/obj/item/weapon/implant))	//We don't want to remove REAL implants. Just shrapnel etc.
-			implanted_object.loc = owner.loc
+			implanted_object.forceMove(owner.loc)
 			implants -= implanted_object
 
 	owner.updatehealth()
@@ -897,8 +898,13 @@ Note that amputating the affected organ does in fact remove the infection from t
 /datum/organ/external/proc/can_use_advanced_tools()
 	return !(status & (ORGAN_DESTROYED|ORGAN_MUTATED|ORGAN_DEAD|ORGAN_PEG|ORGAN_CUT_AWAY))
 
+/datum/organ/external/proc/can_grasp()
+	return (can_grasp && grasp_id)
+
 /datum/organ/external/proc/process_grasp(var/obj/item/c_hand, var/hand_name)
 	if(!c_hand)
+		return
+	if(c_hand.cant_drop)
 		return
 
 	if(is_broken() && !istype(c_hand,/obj/item/tk_grab))
@@ -927,7 +933,7 @@ Note that amputating the affected organ does in fact remove the infection from t
 	if(ismob(W.loc))
 		var/mob/living/H = W.loc
 		H.drop_item(W, force_drop = 1)
-	W.loc = owner
+	W.forceMove(owner)
 
 /****************************************************
 			   ORGAN DEFINES
@@ -964,7 +970,8 @@ Note that amputating the affected organ does in fact remove the infection from t
 	grasp_id = GRASP_LEFT_HAND
 
 /datum/organ/external/l_arm/generate_dropped_organ(current_organ)
-	if(status & ORGAN_PEG) current_organ = new /obj/item/stack/sheet/wood(owner.loc)
+	if(status & ORGAN_PEG)
+		current_organ = new /obj/item/stack/sheet/wood(owner.loc)
 	if(!current_organ)
 		if(status & ORGAN_ROBOT)
 			current_organ= new /obj/item/robot_parts/l_arm(owner.loc)
@@ -1249,7 +1256,8 @@ obj/item/weapon/organ/New(loc, mob/living/carbon/human/H)
 /obj/item/weapon/organ/update_icon(mob/living/carbon/human/H)
 	..()
 
-	if(!H && !species) return
+	if(!H && !species)
+		return
 
 	var/icon/base
 	if(H)

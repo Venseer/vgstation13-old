@@ -22,13 +22,19 @@
 
 /datum/artifact_effect/proc/GetRangeString(var/range)
 	switch(effectmode)
-		if("aura") return "Constant Short-Range Energy Field"
+		if("aura")
+			return "Constant Short-Range Energy Field"
 		if("pulse")
-			if(aurarange > 7) return "Long Range Energy Pulses"
-			else return "Medium Range Energy Pulses"
-		if("worldpulse") return "Extreme Range Energy Pulses"
-		if("contact") return "Requires contact with subject"
-		else return "Unknown Range"
+			if(aurarange > 7)
+				return "Long Range Energy Pulses"
+			else
+				return "Medium Range Energy Pulses"
+		if("worldpulse")
+			return "Extreme Range Energy Pulses"
+		if("contact")
+			return "Requires contact with subject"
+		else
+			return "Unknown Range"
 
 /datum/artifact_effect/proc/HaltEffect()
 	for(var/obj/effect/energy_field/F in created_field)
@@ -62,8 +68,10 @@
 
 					var/mob/living/carbon/human/H = user
 					for(var/datum/organ/external/affecting in H.organs)
-						if(!affecting)    continue
-						if(!istype(affecting, /datum/organ/external))    continue
+						if(!affecting)
+							continue
+						if(!istype(affecting, /datum/organ/external))
+							continue
 						affecting.heal_damage(25, 25)    //fixes getting hit after ingestion, killing you when game updates organ health
 						//user:heal_organ_damage(25, 25)
 						//
@@ -147,7 +155,7 @@
 					to_chat(user, "<span class='warning'>You are suddenly zapped away elsewhere!</span>")
 					if (user.buckled)
 						user.buckled.unbuckle()
-					user.loc = pick(randomturfs)
+					user.forceMove(pick(randomturfs))
 					var/datum/effect/effect/system/spark_spread/sparks = new /datum/effect/effect/system/spark_spread()
 					sparks.set_up(3, 0, get_turf(originator)) //no idea what the 0 is
 					sparks.start()
@@ -353,7 +361,7 @@
 						to_chat(M, "<span class='warning'>You are displaced by a strange force!</span>")
 						if(M.buckled)
 							M.buckled.unbuckle()
-						M.loc = pick(randomturfs)
+						M.forceMove(pick(randomturfs))
 						var/datum/effect/effect/system/spark_spread/sparks = new /datum/effect/effect/system/spark_spread()
 						sparks.set_up(3, 0, get_turf(originator)) //no idea what the 0 is
 						sparks.start()
@@ -469,7 +477,7 @@
 						to_chat(M, "<span class='warning'>You are displaced by a strange force!</span>")
 						if(M.buckled)
 							M.buckled.unbuckle()
-						M.loc = pick(randomturfs)
+						M.forceMove(pick(randomturfs))
 						var/datum/effect/effect/system/spark_spread/sparks = new /datum/effect/effect/system/spark_spread()
 						sparks.set_up(3, 0, get_turf(originator)) //no idea what the 0 is
 						sparks.start()
@@ -510,34 +518,34 @@
 				E.invisibility = 0
 
 			var/obj/effect/energy_field/E = created_field[1]
-			E.loc = locate(originator.x + 2,originator.y + 2,originator.z)
+			E.forceMove(locate(originator.x + 2,originator.y + 2,originator.z))
 			E = created_field[2]
-			E.loc = locate(originator.x + 2,originator.y + 1,originator.z)
+			E.forceMove(locate(originator.x + 2,originator.y + 1,originator.z))
 			E = created_field[3]
-			E.loc = locate(originator.x + 2,originator.y,originator.z)
+			E.forceMove(locate(originator.x + 2,originator.y,originator.z))
 			E = created_field[4]
-			E.loc = locate(originator.x + 2,originator.y - 1,originator.z)
+			E.forceMove(locate(originator.x + 2,originator.y - 1,originator.z))
 			E = created_field[5]
-			E.loc = locate(originator.x + 2,originator.y - 2,originator.z)
+			E.forceMove(locate(originator.x + 2,originator.y - 2,originator.z))
 			E = created_field[6]
-			E.loc = locate(originator.x + 1,originator.y + 2,originator.z)
+			E.forceMove(locate(originator.x + 1,originator.y + 2,originator.z))
 			E = created_field[7]
-			E.loc = locate(originator.x + 1,originator.y - 2,originator.z)
+			E.forceMove(locate(originator.x + 1,originator.y - 2,originator.z))
 			E = created_field[8]
-			E.loc = locate(originator.x,originator.y + 2,originator.z)
+			E.forceMove(locate(originator.x,originator.y + 2,originator.z))
 			E = created_field[9]
-			E.loc = locate(originator.x,originator.y - 2,originator.z)
+			E.forceMove(locate(originator.x,originator.y - 2,originator.z))
 			E = created_field[10]
-			E.loc = locate(originator.x - 1,originator.y + 2,originator.z)
+			E.forceMove(locate(originator.x - 1,originator.y + 2,originator.z))
 			E = created_field[11]
-			E.loc = locate(originator.x - 1,originator.y - 2,originator.z)
+			E.forceMove(locate(originator.x - 1,originator.y - 2,originator.z))
 			E = created_field[12]
-			E.loc = locate(originator.x - 2,originator.y + 2,originator.z)
+			E.forceMove(locate(originator.x - 2,originator.y + 2,originator.z))
 			E = created_field[13]
-			E.loc = locate(originator.x - 2,originator.y + 1,originator.z)
+			E.forceMove(locate(originator.x - 2,originator.y + 1,originator.z))
 			E = created_field[14]
-			E.loc = locate(originator.x - 2,originator.y,originator.z)
+			E.forceMove(locate(originator.x - 2,originator.y,originator.z))
 			E = created_field[15]
-			E.loc = locate(originator.x - 2,originator.y - 1,originator.z)
+			E.forceMove(locate(originator.x - 2,originator.y - 1,originator.z))
 			E = created_field[16]
-			E.loc = locate(originator.x - 2,originator.y - 2,originator.z)
+			E.forceMove(locate(originator.x - 2,originator.y - 2,originator.z))

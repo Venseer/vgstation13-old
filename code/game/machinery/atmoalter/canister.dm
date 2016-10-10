@@ -172,7 +172,7 @@
 		investigation_log(I_ATMOS, "was destoyed by excessive damage.")
 
 		if (src.holding)
-			src.holding.loc = src.loc
+			src.holding.forceMove(src.loc)
 			src.holding = null
 		INVOKE_EVENT(on_destroyed, list())
 		nanomanager.update_uis(src)
@@ -309,7 +309,8 @@
 	if (src.destroyed || gcDestroyed || !get_turf(src))
 		if(!ui)
 			ui = nanomanager.get_open_ui(user, src, ui_key)
-		if(ui) ui.close()
+		if(ui)
+			ui.close()
 		return
 
 	// this is the data which will be sent to the ui
@@ -373,7 +374,7 @@
 
 			if(istype(holding, /obj/item/weapon/tank))
 				holding.manipulated_by = usr.real_name
-			holding.loc = loc
+			holding.forceMove(loc)
 			holding = null
 
 	if (href_list["pressure_adj"])

@@ -247,14 +247,14 @@
 
 	// -- Mode/mind specific stuff goes here
 
-	if((H.mind in ticker.mode:revolutionaries) || (H.mind in ticker.mode:head_revolutionaries))
+	if(isrev(H) || isrevhead(H))
 		ticker.mode.update_all_rev_icons() //So the icon actually appears
-	if(H.mind in ticker.mode.syndicates)
+	if(isnukeop(H))
 		ticker.mode.update_all_synd_icons()
-	if (H.mind in ticker.mode.cult)
+	if (iscult(H))
 		ticker.mode.add_cultist(src.occupant.mind)
 		ticker.mode.update_all_cult_icons() //So the icon actually appears
-	if(H.mind in ticker.mode.wizards)
+	if(iswizard(H) || isapprentice(H))
 		ticker.mode.update_all_wizard_icons()
 	if(("\ref[H.mind]" in ticker.mode.necromancer) || (H.mind in ticker.mode.risen))
 		ticker.mode.update_all_necro_icons()
@@ -414,7 +414,7 @@
 
 		/*
 		for(var/obj/O in src)
-			O.loc = src.loc
+			O.forceMove(src.loc)
 		*/
 		return
 
@@ -423,7 +423,7 @@
 
 	/*
 	for(var/obj/O in src)
-		O.loc = src.loc
+		O.forceMove(src.loc)
 	*/
 
 	if (occupant.client)
@@ -483,28 +483,29 @@
 	return
 
 /obj/machinery/cloning/clonepod/emp_act(severity)
-	if(prob(100/severity)) malfunction()
+	if(prob(100/severity))
+		malfunction()
 	..()
 
 /obj/machinery/cloning/clonepod/ex_act(severity)
 	switch(severity)
 		if(1.0)
 			for(var/atom/movable/A as mob|obj in src)
-				A.loc = src.loc
+				A.forceMove(src.loc)
 				ex_act(severity)
 			qdel(src)
 			return
 		if(2.0)
 			if (prob(50))
 				for(var/atom/movable/A as mob|obj in src)
-					A.loc = src.loc
+					A.forceMove(src.loc)
 					ex_act(severity)
 				qdel(src)
 				return
 		if(3.0)
 			if (prob(25))
 				for(var/atom/movable/A as mob|obj in src)
-					A.loc = src.loc
+					A.forceMove(src.loc)
 					ex_act(severity)
 				qdel(src)
 				return

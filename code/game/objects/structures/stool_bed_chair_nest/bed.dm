@@ -12,7 +12,7 @@
 	desc = "This is used to lie in, sleep in or strap on."
 	icon_state = "bed"
 	icon = 'icons/obj/stools-chairs-beds.dmi'
-
+	layer = BELOW_OBJ_LAYER
 	anchored = 1
 	var/sheet_type = /obj/item/stack/sheet/metal
 	var/sheet_amt = 1
@@ -185,5 +185,5 @@
 	flags = LOCKED_SHOULD_LIE
 
 /datum/locking_category/bed/roller
-	pixel_y_offset = 6
+	pixel_y_offset = 6 * PIXEL_MULTIPLIER
 	flags = DENSE_WHEN_LOCKING | LOCKED_SHOULD_LIE

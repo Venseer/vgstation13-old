@@ -2,7 +2,7 @@
 	spawn()
 		var/list/pick_turfs = list()
 		for(var/turf/simulated/floor/T in turfs)
-			if(T.z == 1)
+			if(T.z == map.zMainStation)
 				pick_turfs += T
 
 		if(pick_turfs.len)
@@ -37,11 +37,13 @@
 				//get our enter and exit locations
 				var/turf/simulated/floor/enter = pick_turfs[i]
 				pick_turfs -= enter							//remove it from pickable turfs list
-				if( !enter || !istype(enter) )	continue	//sanity
+				if( !enter || !istype(enter) )
+					continue	//sanity
 
 				var/turf/simulated/floor/exit = pick(pick_turfs)
 				pick_turfs -= exit
-				if( !exit || !istype(exit) )	continue	//sanity
+				if( !exit || !istype(exit) )
+					continue	//sanity
 
 				create_wormhole(enter,exit)
 

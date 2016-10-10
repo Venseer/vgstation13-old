@@ -12,6 +12,8 @@
 	var/custom_sprite = 0 //Due to all the sprites involved, a var for our custom borgs may be best
 	//var/crisis //Admin-settable for combat module use.
 
+	var/obj/item/device/station_map/station_holomap = null
+
 //Hud stuff
 
 	var/obj/screen/cells = null
@@ -115,6 +117,8 @@
 		else
 			lawupdate = 0
 
+	station_holomap = new(src)
+
 	radio = new /obj/item/device/radio/borg(src)
 	if(!scrambledcodes && !camera)
 		camera = new /obj/machinery/camera(src)
@@ -153,7 +157,7 @@
 	add_language(LANGUAGE_CLATTER, 0)
 	add_language(LANGUAGE_MONKEY, 0)
 	add_language(LANGUAGE_UNATHI, 0)
-	add_language(LANGUAGE_SIIK_TAJR, 0)
+	add_language(LANGUAGE_CATBEAST, 0)
 	add_language(LANGUAGE_SKRELLIAN, 0)
 	add_language(LANGUAGE_GUTTER, 0)
 	add_language(LANGUAGE_MONKEY, 0)
@@ -182,8 +186,10 @@
 /mob/living/silicon/robot/Destroy()
 	if(mmi)//Safety for when a cyborg gets dust()ed. Or there is no MMI inside.
 		var/turf/T = get_turf(loc)//To hopefully prevent run time errors.
-		if(T)	mmi.loc = T
-		if(mind)	mind.transfer_to(mmi.brainmob)
+		if(T)
+			mmi.forceMove(T)
+		if(mind)
+			mind.transfer_to(mmi.brainmob)
 		if(mmi.brainmob)
 			mmi.brainmob.locked_to_z = locked_to_z
 		mmi = null
@@ -287,6 +293,7 @@
 			module_sprites["Marina-MN"] = "marinaMN"
 			module_sprites["Sleek"] = "sleekminer"
 			module_sprites["#31"] = "servbot-miner"
+			module_sprites["Kodiak"] = "kodiak-miner"
 			speed = -1
 
 		if("Medical")
@@ -302,6 +309,7 @@
 			module_sprites["Eve"] = "eve"
 			module_sprites["Sleek"] = "sleekmedic"
 			module_sprites["#17"] = "servbot-medi"
+			module_sprites["Arachne"] = "arachne"
 			speed = -2
 
 		if("Security")
@@ -331,6 +339,7 @@
 			module_sprites["Marina-EN"] = "marinaEN"
 			module_sprites["Sleek"] = "sleekengineer"
 			module_sprites["#25"] = "servbot-engi"
+			module_sprites["Kodiak"] = "kodiak-eng"
 			speed = -2
 
 		if("Janitor")
@@ -369,11 +378,11 @@
 	if(modtype == "Medical" || modtype == "Security" || modtype == "Combat")
 		status_flags &= ~CANPUSH
 
+	var/picked  = pick(module_sprites)
+	icon_state = module_sprites[picked]
+
 	if(!forced_module)
 		choose_icon(6, module_sprites)
-	else
-		var/picked  = pick(module_sprites)
-		icon_state = module_sprites[picked]
 
 	base_icon = icon_state
 	SetEmagged(emagged) // Update emag status and give/take emag modules away
@@ -505,7 +514,8 @@
 
 	var/list/installed_components = list()
 	for(var/V in components)
-		if(V == "power cell") continue
+		if(V == "power cell")
+			continue
 		var/datum/robot_component/C = components[V]
 		if(C.installed)
 			installed_components += V
@@ -521,6 +531,15 @@
 	else
 		C.toggled = 1
 		to_chat(src, "<span class='warning'>You enable [C.name].</span>")
+
+/mob/living/silicon/robot/verb/toggle_station_map()
+	set name = "Toggle Station Holomap"
+	set desc = "Toggle station holomap on your screen"
+	set category = "Robot Commands"
+	if(isUnconscious())
+		return
+
+	station_holomap.toggleHolomap(src)
 
 /mob/living/silicon/robot/blob_act()
 	if(flags & INVULNERABLE)
@@ -605,7 +624,8 @@
 		stat(null, text("Welder Fuel: [WT.get_fuel()]/[WT.max_fuel]"))
 
 /mob/living/silicon/robot/proc/show_stacks()
-	if(!module) return
+	if(!module)
+		return
 	for(var/obj/item/stack/S in module.modules)
 		stat(null, text("[S.name]: [S.amount]/[S.max_amount]"))
 
@@ -625,7 +645,8 @@
 
 
 /mob/living/silicon/robot/restrained()
-	if(timestopped) return 1 //under effects of time magick
+	if(timestopped)
+		return 1 //under effects of time magick
 	return 0
 
 
@@ -656,7 +677,8 @@
 /mob/living/silicon/robot/bullet_act(var/obj/item/projectile/Proj)
 	..(Proj)
 	updatehealth()
-	if(prob(75) && Proj.damage > 0) spark_system.start()
+	if(prob(75) && Proj.damage > 0)
+		spark_system.start()
 	return 2
 
 
@@ -717,7 +739,8 @@
 			else
 				to_chat(user, "The cover is already open.")
 		else
-			if(emagged == 1) return 1
+			if(emagged == 1)
+				return 1
 			if(wiresexposed)
 				to_chat(user, "The wires get in your way.")
 			else
@@ -772,7 +795,7 @@
 				C.wrapped = W
 				C.install()
 				user.drop_item(W)
-				W.loc = null
+				W.forceMove(null)
 
 				to_chat(usr, "<span class='notice'>You install the [W.name].</span>")
 
@@ -830,7 +853,8 @@
 				// Okay we're not removing the cell or an MMI, but maybe something else?
 				var/list/removable_components = list()
 				for(var/V in components)
-					if(V == "power cell") continue
+					if(V == "power cell")
+						continue
 					var/datum/robot_component/C = components[V]
 					if(C.installed == 1 || C.installed == -1)
 						removable_components += V
@@ -841,7 +865,7 @@
 				var/datum/robot_component/C = components[remove]
 				var/obj/item/I = C.wrapped
 				to_chat(user, "You remove \the [I].")
-				I.loc = src.loc
+				I.forceMove(src.loc)
 
 				if(C.installed == 1)
 					C.uninstall()
@@ -956,7 +980,7 @@
 					O.show_message(text("<span class='notice'>[M] caresses [src]'s plating with its scythe like arm.</span>"), 1)
 
 		if (I_GRAB)
-			if (M == src)
+			if (M.grab_check(src))
 				return
 			var/obj/item/weapon/grab/G = getFromPool(/obj/item/weapon/grab,M,src)
 
@@ -1017,7 +1041,8 @@
 		to_chat(M, "You cannot attack people before the game has started.")
 		return
 
-	if(M.Victim) return // can't attack while eating!
+	if(M.Victim)
+		return // can't attack while eating!
 
 	if (health > -100)
 
@@ -1041,12 +1066,18 @@
 			var/stunprob = 10
 
 			switch(M.powerlevel)
-				if(1 to 2) stunprob = 20
-				if(3 to 4) stunprob = 30
-				if(5 to 6) stunprob = 40
-				if(7 to 8) stunprob = 60
-				if(9) 	   stunprob = 70
-				if(10) 	   stunprob = 95
+				if(1 to 2)
+					stunprob = 20
+				if(3 to 4)
+					stunprob = 30
+				if(5 to 6)
+					stunprob = 40
+				if(7 to 8)
+					stunprob = 60
+				if(9)
+					stunprob = 70
+				if(10)
+					stunprob = 95
 
 			if(prob(stunprob))
 				M.powerlevel -= 3
@@ -1152,7 +1183,9 @@
 
 	overlays.len = 0
 	if(stat == 0 && cell != null)
-		overlays += image(icon,"eyes-[icon_state]", LIGHTING_LAYER + 1)
+		var/image/eyes = image(icon,"eyes-[icon_state]", ABOVE_LIGHTING_LAYER)
+		eyes.plane = LIGHTING_PLANE
+		overlays += eyes
 
 	if(opened)
 		if(custom_sprite)//Custom borgs also have custom panels, heh
@@ -1280,16 +1313,20 @@
 	if (href_list["lawc"]) // Toggling whether or not a law gets stated by the State Laws verb --NeoFite
 		var/L = text2num(href_list["lawc"])
 		switch(lawcheck[L+1])
-			if ("Yes") lawcheck[L+1] = "No"
-			if ("No") lawcheck[L+1] = "Yes"
+			if ("Yes")
+				lawcheck[L+1] = "No"
+			if ("No")
+				lawcheck[L+1] = "Yes"
 //		to_chat(src, text ("Switching Law [L]'s report status to []", lawcheck[L+1]))
 		checklaws()
 
 	if (href_list["lawi"]) // Toggling whether or not a law gets stated by the State Laws verb --NeoFite
 		var/L = text2num(href_list["lawi"])
 		switch(ioncheck[L])
-			if ("Yes") ioncheck[L] = "No"
-			if ("No") ioncheck[L] = "Yes"
+			if ("Yes")
+				ioncheck[L] = "No"
+			if ("No")
+				ioncheck[L] = "Yes"
 //		to_chat(src, text ("Switching Law [L]'s report status to []", lawcheck[L+1]))
 		checklaws()
 	if (href_list["laws"]) // With how my law selection code works, I changed statelaws from a verb to a proc, and call it through my law selection panel. --NeoFite
@@ -1428,13 +1465,15 @@
 	set category = "IC"
 	set src = usr
 
-	if(attack_delayer.blocked()) return
+	if(attack_delayer.blocked())
+		return
 
 	if(isVentCrawling())
 		to_chat(src, "<span class='danger'>Not while we're vent crawling!</span>")
 		return
 
-	if(stat == DEAD) return
+	if(stat == DEAD)
+		return
 	var/obj/item/W = get_active_hand()
 	if (W)
 		W.attack_self(src)
@@ -1468,26 +1507,16 @@
 
 	pose =  copytext(sanitize(input(usr, "This is [src]. It is...", "Pose", null)  as text), 1, MAX_MESSAGE_LEN)
 
-/mob/living/silicon/robot/verb/set_flavor()
-	set name = "Set Flavour Text"
-	set desc = "Sets an extended description of your character's features."
-	set category = "IC"
-
-	flavor_text =  copytext(sanitize(input(usr, "Please enter your new flavour text.", "Flavour text", null)  as text), 1)
-
 /mob/living/silicon/robot/proc/choose_icon(var/triesleft, var/list/module_sprites)
 	if(triesleft == 0 || !module_sprites.len)
 		return
 	else
 		triesleft--
 
-	lockcharge = 1  //Locks borg until it select an icon to avoid secborgs running around with a standard sprite
-
 	var/icontype = input("Select an icon! [triesleft>0 ? "You have [triesleft] more chances." : "This is your last try."]", "Robot", null, null) as null|anything in module_sprites
 
 	if(icontype)
 		icon_state = module_sprites[icontype]
-		lockcharge = null
 	else
 		triesleft++
 		return
@@ -1537,3 +1566,15 @@
 
 /mob/living/silicon/robot/CheckSlip()
 	return (istype(module,/obj/item/weapon/robot_module/engineering)? -1 : 0)
+
+//Help with the garbage collection of the module on the robot end
+/mob/living/silicon/robot/proc/remove_module()
+	uneq_all()
+	if(hud_used)
+		shown_robot_modules = 0
+		hud_used.update_robot_modules_display()
+	if(client)
+		for(var/obj/A in module.upgrades)
+			client.screen -= A
+	module.remove_languages(src)
+	module = null

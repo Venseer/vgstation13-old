@@ -6,7 +6,7 @@
 /datum/locking_category/popout_cake
 	pixel_y_offset = 1 //First row of pixels on the cake is transparent :^
 
-	var/pixel_y_offset_max = 24
+	var/pixel_y_offset_max = 24 * PIXEL_MULTIPLIER
 
 /datum/locking_category/popout_cake/lock(atom/movable/AM)
 	pixel_y_offset -= AM.pixel_y
@@ -25,10 +25,9 @@
 	..()
 
 	animate(AM) //Stop the animation
-	AM.pixel_y -= pixel_y_offset_max
+	AM.pixel_y -= pixel_y_offset_max * PIXEL_MULTIPLIER
 
-	owner.plane = initial(owner.plane)
-	owner.layer = initial(owner.layer)
+	owner.reset_plane_and_layer()
 
 /obj/structure/popout_cake
 	name = "large cake"
@@ -64,6 +63,9 @@
 
 	user.visible_message("<span class='notice'>[user] starts climbing into \the [src]!</span>")
 	if(do_after(user, src, 60))
+		if(locate(/mob/living) in contents)
+			to_chat(user, "<span class='info'>There appears to be something inside of \the [src]!</span>")
+			return
 		user.forceMove(src)
 		to_chat(user, "<span class='info'>You are now inside the cake! When you're ready to emerge from the cake in a blaze of confetti and party horns, pull on the string by clicking on \the [src] (<b>this can only be done once</b>). If you wish to leave without setting off the confetti, just attempt to move out of the cake!</span>")
 

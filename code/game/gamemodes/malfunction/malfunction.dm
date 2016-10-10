@@ -83,7 +83,8 @@ Rebooting world in 5 seconds."})
 	if(emergency_shuttle)
 		emergency_shuttle.always_fake_recall = 1
 	spawn (rand(waittime_l, waittime_h))
-		if(!mixed) send_intercept()
+		if(!mixed)
+			send_intercept()
 	..()
 
 
@@ -214,7 +215,8 @@ You should now be able to use your Explode verb to interface with the nuclear fi
 		AI_mind.current.verbs -= /datum/game_mode/malfunction/proc/ai_win
 	ticker.mode:explosion_in_progress = 1
 	for(var/mob/M in player_list)
-		if(M.client) M << 'sound/machines/Alarm.ogg'
+		if(M.client)
+			M << 'sound/machines/Alarm.ogg'
 	to_chat(world, "<span class='danger'>Self-destruction signal received. Self-destructing in 10...</span>")
 	for (var/i=9 to 1 step -1)
 		sleep(10)
@@ -261,7 +263,7 @@ You should now be able to use your Explode verb to interface with the nuclear fi
 	else if (!station_captured && !malf_dead && !station_was_nuked && crew_evacuated)
 		feedback_set_details("round_end_result","halfwin - evacuated")
 		completion_text += "<FONT size = 3><B>Neutral Victory</B></FONT>"
-		completion_text += "<BR><B>The Corporation has lose [station_name()]! All survived personnel will be fired!</B>"
+		completion_text += "<BR><B>The Corporation has lost [station_name()]! All surviving personnel will be fired!</B>"
 
 	else if (!station_captured && !malf_dead && !station_was_nuked && !crew_evacuated)
 		feedback_set_details("round_end_result","nalfwin - interrupted")

@@ -5,6 +5,9 @@
 	icon_state = "firingrange"
 	dynamic_lighting = 1
 
+/area/vault/holomapAlwaysDraw()
+	return 0
+
 /area/vault/icetruck
 
 /area/vault/asteroid
@@ -32,17 +35,50 @@
 
 /area/vault/spacepond
 
+/area/vault/spacepond/wine_cellar
+
 /area/vault/ioufort
 
 /area/vault/hive_shuttle
 
+//prison vault
+
+/area/vault/prison_ship
+	requires_power = 1
+
+/area/vault/prison
+
+/obj/item/weapon/disk/shuttle_coords/vault/prison
+	destination = /obj/docking_port/destination/vault/prison
+
+/obj/docking_port/destination/vault/prison
+	areaname = "holding facility 10"
+
+//listening outpost
+
 /area/vault/listening
 	requires_power = 1
 
+/obj/item/weapon/disk/shuttle_coords/vault/listening
+	destination = /obj/docking_port/destination/vault/listening
+
+/obj/docking_port/destination/vault/listening
+	areaname = "outpost V-24"
 /area/vault/biodome
 	requires_power = 1
 
+//biodome
+
+/obj/item/weapon/disk/shuttle_coords/vault/biodome
+	destination = /obj/docking_port/destination/vault/biodome
+
+/obj/docking_port/destination/vault/biodome
+	areaname = "biodome"
+
 /area/vault/brokeufo
+	requires_power = 1
+
+/area/vault/AIsat
 	requires_power = 1
 
 /mob/living/simple_animal/hostile/monster/cyber_horror/quiet
@@ -71,7 +107,8 @@
 
 /obj/effect/landmark/catechizer_spawn/New()
 	spawn()
-		if(!isturf(loc)) return
+		if(!isturf(loc))
+			return
 
 		var/list/all_spawns = list()
 		for(var/obj/effect/landmark/catechizer_spawn/S in get_area(src))
@@ -156,7 +193,7 @@
 
 /obj/machinery/power/apc/no_alerts/vault_listening/initialize()
 	. = ..()
-	name = "\improper Listening Outpost APC."
+	name = "\improper Listening Outpost APC"
 
 /obj/machinery/power/battery/smes/vault_listening
 	chargelevel = 30000
@@ -182,3 +219,47 @@
 	icon_state = "duey0"
 	icon_initial = "duey"
 	Max_Fertilizers = 50
+
+/obj/structure/ladder/spacepond/ground
+	name = "wine cellar"
+	id = "spacepond"
+	height = 1
+
+/obj/structure/ladder/spacepond/winecellar
+	name = "space cabin"
+	id = "spacepond"
+	height = 0
+
+/mob/living/silicon/decoy/AIvault/New()
+	name = pick(ai_names)
+	icon_state = "ai-malf"
+	..()
+
+/obj/machinery/power/apc/no_alerts/vault_AIsat/initialize()
+	. = ..()
+	name = "\improper AI Satellite APC"
+
+/obj/machinery/porta_turret/AIvault
+	req_access = list(access_ai_upload)
+	check_records = 1
+	criminals = 1
+	auth_weapons = 1
+	stun_all = 1
+	check_anomalies = 1
+	ai = 1
+
+/obj/machinery/porta_turret/AIvault/New()
+	installed = new/obj/item/weapon/gun/energy/laser/retro/ancient(src)
+	..()
+	if(prob(25))
+		dir = pick(alldirs)
+		die()
+
+/obj/item/weapon/gun/energy/laser/retro/ancient
+	name = "ancient laser gun"
+	desc = "Once a highly dangerous weapon, this laser has degraded over decades into a still somewhat dangerous weapon."
+	projectile_type = /obj/item/projectile/beam/retro/weak
+
+/obj/item/projectile/beam/retro/weak
+	damage = 15
+	linear_movement = 0

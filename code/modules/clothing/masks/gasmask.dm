@@ -10,7 +10,7 @@
 	gas_transfer_coefficient = 0.01
 	permeability_coefficient = 0.01
 	siemens_coefficient = 0.9
-	species_fit = list(VOX_SHAPED)
+	species_fit = list(VOX_SHAPED, GREY_SHAPED)
 	body_parts_covered = FACE
 	pressure_resistance = ONE_ATMOSPHERE
 	var/canstage = 1
@@ -87,14 +87,14 @@
 	var/voice = "Unknown"
 	var/vchange = 1//This didn't do anything before. It now checks if the mask has special functions/N
 	canstage = 0
-	origin_tech = "syndicate=4"
+	origin_tech = Tc_SYNDICATE + "=4"
 	action_button_name = "Toggle Mask"
-	species_fit = list(VOX_SHAPED)
+	species_fit = list(VOX_SHAPED, GREY_SHAPED)
 	var/list/clothing_choices = list()
 
 /obj/item/clothing/mask/gas/voice/New()
 	..()
-	for(var/Type in typesof(/obj/item/clothing/mask) - list(/obj/item/clothing/mask, /obj/item/clothing/mask/gas/voice))
+	for(var/Type in existing_typesof(/obj/item/clothing/mask) - list(/obj/item/clothing/mask, /obj/item/clothing/mask/gas/voice))
 		clothing_choices += new Type
 	return
 
@@ -144,7 +144,7 @@
 	desc = "A true prankster's facial attire. A clown is incomplete without his wig and mask."
 	icon_state = "clown"
 	item_state = "clown_hat"
-	species_fit = list(VOX_SHAPED)
+	species_fit = list(VOX_SHAPED, GREY_SHAPED)
 	can_flip = 0
 	canstage = 0
 
@@ -154,6 +154,12 @@
 		new /mob/living/simple_animal/hostile/retaliate/cluwne/goblin(get_turf(src))
 		qdel(W)
 		qdel(src)
+
+/obj/item/clothing/mask/gas/clown_hat/stickymagic
+	canremove = 0
+
+/obj/item/clothing/mask/gas/clown_hat/stickymagic/acidable()
+	return 0
 
 /obj/item/clothing/mask/gas/clown_hat/wiz
 	name = "purple clown wig and mask"
@@ -187,7 +193,7 @@
 	desc = "The traditional mime's mask. It has an eerie facial posture."
 	icon_state = "mime"
 	item_state = "mime"
-	species_fit = list(VOX_SHAPED)
+	species_fit = list(VOX_SHAPED, GREY_SHAPED)
 	can_flip = 0
 	canstage = 0
 	var/muted = 0
@@ -195,6 +201,13 @@
 /obj/item/clothing/mask/gas/mime/treat_mask_speech(var/datum/speech/speech)
 	if(src.muted)
 		speech.message=""
+
+/obj/item/clothing/mask/gas/mime/stickymagic
+	canremove = 0
+	muted = 1
+
+/obj/item/clothing/mask/gas/mime/acidable()
+	return 0
 
 /obj/item/clothing/mask/gas/monkeymask
 	name = "monkey mask"

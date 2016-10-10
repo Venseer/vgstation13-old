@@ -188,7 +188,8 @@ var/const/BLOOD_VOLUME_SURVIVE = 122
 //Gets blood from mob to the container, preserving all data in it.
 /mob/living/carbon/proc/take_blood(obj/item/weapon/reagent_containers/container, var/amount)
 	var/datum/reagent/B = (container ? get_blood(container.reagents) : null)
-	if(!B) B = new /datum/reagent/blood
+	if(!B)
+		B = new /datum/reagent/blood
 	B.holder = (container? container.reagents : null)
 	B.volume += amount
 
@@ -217,6 +218,13 @@ var/const/BLOOD_VOLUME_SURVIVE = 122
 		temp_chem += R.id
 		temp_chem[R.id] = R.volume
 	B.data["trace_chem"] = list2params(temp_chem)
+
+	if(container)
+		container.reagents.reagent_list |= B
+		container.reagents.update_total()
+		container.on_reagent_change()
+		container.reagents.handle_reactions()
+		container.update_icon()
 	return B
 
 //For humans, blood does not appear from blue, it comes from vessels.
@@ -230,6 +238,11 @@ var/const/BLOOD_VOLUME_SURVIVE = 122
 
 	. = ..()
 	vessel.remove_reagent(BLOOD,amount) // Removes blood if human
+
+/mob/living/carbon/monkey/take_blood(obj/item/weapon/reagent_containers/container, var/amount)
+	if(!isDead())
+		adjustOxyLoss(amount)
+		. = ..()
 
 //Transfers blood from container ot vessels
 /mob/living/carbon/proc/inject_blood(obj/item/weapon/reagent_containers/container, var/amount)
@@ -280,20 +293,25 @@ var/const/BLOOD_VOLUME_SURVIVE = 122
 	return res
 
 proc/blood_incompatible(donor,receiver)
-	if(!donor || !receiver) return 0
+	if(!donor || !receiver)
+		return 0
 	var
 		donor_antigen = copytext(donor,1,lentext(donor))
 		receiver_antigen = copytext(receiver,1,lentext(receiver))
 		donor_rh = (findtext(donor,"+")>0)
 		receiver_rh = (findtext(receiver,"+")>0)
-	if(donor_rh && !receiver_rh) return 1
+	if(donor_rh && !receiver_rh)
+		return 1
 	switch(receiver_antigen)
 		if("A")
-			if(donor_antigen != "A" && donor_antigen != "O") return 1
+			if(donor_antigen != "A" && donor_antigen != "O")
+				return 1
 		if("B")
-			if(donor_antigen != "B" && donor_antigen != "O") return 1
+			if(donor_antigen != "B" && donor_antigen != "O")
+				return 1
 		if("O")
-			if(donor_antigen != "O") return 1
+			if(donor_antigen != "O")
+				return 1
 		//AB is a universal receiver.
 	return 0
 

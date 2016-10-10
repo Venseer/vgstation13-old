@@ -92,6 +92,8 @@
 
 	if(href_list["remove_dest"] && mode)
 		var/idx = Clamp(text2num(href_list["remove_dest"]), 1, destinations.len)
+		if(currTag == destinations[idx])
+			currTag = 0 // In case the index was at the end of the list
 		destinations -= destinations[idx]
 		interact(usr)
 		return 1
@@ -126,7 +128,8 @@
 	return
 
 /obj/machinery/disposal/deliveryChute/Bumped(var/atom/movable/AM) //Go straight into the chute
-	if(istype(AM, /obj/item/projectile) || istype(AM, /obj/item/weapon/dummy))	return
+	if(istype(AM, /obj/item/projectile) || istype(AM, /obj/item/weapon/dummy))
+		return
 
 	if(dir != get_dir(src, AM))
 		return
@@ -135,10 +138,10 @@
 
 	if(istype(AM, /obj))
 		var/obj/O = AM
-		O.loc = src
+		O.forceMove(src)
 	else if(istype(AM, /mob))
 		var/mob/M = AM
-		M.loc = src
+		M.forceMove(src)
 	//src.flush() This spams audio like fucking crazy.
 	// Instead, we queue up for the next process.
 	doFlushIn=5 // Ticks, adjust if delay is too long or too short
@@ -201,7 +204,8 @@
 			playsound(get_turf(src), 'sound/items/Welder2.ogg', 100, 1)
 			to_chat(user, "You start slicing the floorweld off the delivery chute.")
 			if(do_after(user, src,20))
-				if(!src || !W.isOn()) return
+				if(!src || !W.isOn())
+					return
 				to_chat(user, "You sliced the floorweld off the delivery chute.")
 				var/obj/structure/disposalconstruct/C = new (src.loc)
 				C.ptype = 8 // 8 =  Delivery chute

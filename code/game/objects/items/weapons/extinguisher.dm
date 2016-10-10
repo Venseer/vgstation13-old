@@ -1,3 +1,4 @@
+#define REAGENT_USE 5 // amount of reagent used on each spray
 
 /obj/item/weapon/extinguisher
 	name = "fire extinguisher"
@@ -82,7 +83,8 @@
 	return
 
 /obj/item/weapon/extinguisher/attackby(obj/item/W, mob/user)
-	if(user.stat || user.restrained() || user.lying)	return
+	if(user.stat || user.restrained() || user.lying)
+		return
 	if (iswrench(W))
 		if(!is_open_container())
 			user.visible_message("[user] begins to unwrench the fill cap on \the [src].","<span class='notice'>You begin to unwrench the fill cap on \the [src].</span>")
@@ -99,7 +101,8 @@
 		return
 
 	if (istype(W, /obj/item) && !is_open_container() && !istype(src, /obj/item/weapon/extinguisher/foam) && !istype(W, /obj/item/weapon/evidencebag))
-		if(W.is_open_container()) return //We're probably trying to fill it
+		if(W.is_open_container())
+			return //We're probably trying to fill it
 		if(W.w_class > W_CLASS_TINY)
 			to_chat(user, "\The [W] won't fit into the nozzle!")
 			return
@@ -123,7 +126,7 @@
 
 		if(is_open_container() && reagents.total_volume)
 			to_chat(user, "<span class='notice'>You empty \the [src] onto [target].</span>")
-			user.investigation_log(I_CHEMS, "has splashed [reagents.get_reagent_ids(1)] from \a [src] \ref[src] onto \the [target].")
+			user.investigation_log(I_CHEMS, "has splashed [reagents.get_reagent_ids(1)] from \a [src] ([type]) onto \the [target].")
 			if(reagents.has_reagent(FUEL))
 				message_admins("[user.name] ([user.ckey]) poured Welder Fuel onto [target]. (<A HREF='?_src_=holder;adminplayerobservecoodjump=1;X=[user.x];Y=[user.y];Z=[user.z]'>JMP</a>)")
 				log_game("[user.name] ([user.ckey]) poured Welder Fuel onto [target]. (<A HREF='?_src_=holder;adminplayerobservecoodjump=1;X=[user.x];Y=[user.y];Z=[user.z]'>JMP</a>)")
@@ -142,10 +145,9 @@
 		if (world.time < src.last_use + 20)
 			return
 		user.delayNextAttack(5, 1)
-		var/badshit = reagents.write_logged_reagents()
-		if(badshit)
-			message_admins("[user.name] ([user.ckey]) used \a [src] that contained (<span class='warning'>[badshit]</span>). (<A HREF='?_src_=holder;adminplayerobservecoodjump=1;X=[user.x];Y=[user.y];Z=[user.z]'>JMP</a>)")
-			log_game("[user.name] ([user.ckey]) used \a [src] that contained [badshit] at [user.x], [user.y], [user.z]")
+
+		reagents.log_bad_reagents(user, src)
+		user.investigation_log(I_CHEMS, "sprayed [REAGENT_USE]u from \a [src] ([type]) containing [reagents.get_reagent_ids(1)] towards [target] ([target.x], [target.y], [target.z]).")
 
 		src.last_use = world.time
 
@@ -175,14 +177,13 @@
 				sleep(3)
 				B.Move(get_step(user,movementdirection), movementdirection)
 
-		if(locate(/obj) in src)
-			for(var/obj/thing in src)
-				thing.loc = get_turf(src)
-				thing.throw_at(target,10,thing.throw_speed*3)
-				user.visible_message(
-					"<span class='danger'>[user] fires [src] and launches [thing] at [target]!</span>",
-					"<span class='danger'>You fire [src] and launch [thing] at [target]!</span>")
-				break
+		for(var/obj/thing in src)
+			thing.forceMove(get_turf(src))
+			thing.throw_at(target,10,thing.throw_speed*3)
+			user.visible_message(
+				"<span class='danger'>[user] fires [src] and launches [thing] at [target]!</span>",
+				"<span class='danger'>You fire [src] and launch [thing] at [target]!</span>")
+			break
 
 		var/turf/T = get_turf(target)
 		var/turf/T1 = get_step(T,turn(direction, 90))
@@ -190,7 +191,7 @@
 
 		var/list/the_targets = list(T,T1,T2)
 
-		for(var/a=0, a<5, a++)
+		for(var/a=0, a<REAGENT_USE, a++)
 			spawn(0)
 				var/datum/reagents/R = new/datum/reagents(5)
 				R.my_atom = src
@@ -200,16 +201,20 @@
 				if(ccolor)
 					W.color = ccolor
 				var/turf/my_target = pick(the_targets)
-				if(!W) return
+				if(!W)
+					return
 				W.reagents = R
 				R.my_atom = W
-				if(!W || !src) return
+				if(!W || !src)
+					return
 				for(var/b=0, b<5, b++)
 					step_towards(W,my_target)
-					if(!W || !W.reagents) return
+					if(!W || !W.reagents)
+						return
 					W.reagents.reaction(get_turf(W), TOUCH)
 					for(var/atom/atm in get_turf(W))
-						if(!W) return
+						if(!W)
+							return
 						W.reagents.reaction(atm, TOUCH)                      // Touch, since we sprayed it.
 						if(W.reagents.has_reagent(WATER))
 							if(istype(atm,/obj/machinery/space_heater/campfire))
@@ -224,12 +229,11 @@
 							if(atm.molten) // Molten shit.
 								atm.molten=0
 								atm.solidify()
-					if(W.loc == my_target) break
+					if(W.loc == my_target)
+						break
 					sleep(2)
 
-		if((istype(user.loc, /turf/space)) || (user.areaMaster.has_gravity == 0))
-			user.inertia_dir = get_dir(target, user)
-			step(user, user.inertia_dir)
+		user.apply_inertia(get_dir(target, user))
 	else
 		return ..()
 	return
@@ -292,21 +296,24 @@
 
 		var/list/the_targets = list(T,T1,T2)
 
-		for(var/a=0, a<5, a++)
+		for(var/a=0, a<REAGENT_USE, a++)
 			spawn(0)
 				var/datum/reagents/R = new/datum/reagents(5)
 				R.my_atom = src
 				reagents.trans_to_holder(R,1)
 				var/obj/effect/effect/foam/fire/W = new /obj/effect/effect/foam/fire( get_turf(src) , R)
 				var/turf/my_target = pick(the_targets)
-				if(!W || !src) return
+				if(!W || !src)
+					return
 				for(var/b=0, b<5, b++)
 					var/turf/oldturf = get_turf(W)
 					step_towards(W,my_target)
-					if(!W || !W.reagents) return
+					if(!W || !W.reagents)
+						return
 					W.reagents.reaction(get_turf(W), TOUCH)
 					for(var/atom/atm in get_turf(W))
-						if(!W) return
+						if(!W)
+							return
 						W.reagents.reaction(atm, TOUCH)                      // Touch, since we sprayed it.
 						if(W.reagents.has_reagent(WATER))
 							if(isliving(atm)) // For extinguishing mobs on fire
@@ -321,12 +328,13 @@
 					var/obj/effect/effect/foam/fire/F = locate() in oldturf
 					if(!istype(F) && oldturf != get_turf(src))
 						F = new /obj/effect/effect/foam/fire( get_turf(oldturf) , W.reagents)
-					if(W.loc == my_target) break
+					if(W.loc == my_target)
+						break
 					sleep(2)
 
-		if((istype(user.loc, /turf/space)) || (user.areaMaster.has_gravity == 0))
-			user.inertia_dir = get_dir(target, user)
-			step(user, user.inertia_dir)
+		user.apply_inertia(get_dir(target, user))
 	else
 		return ..()
 	return
+
+#undef REAGENT_USE

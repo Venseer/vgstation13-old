@@ -56,8 +56,6 @@ var/global/list/alert_overlays_global = list()
 #define FIREDOOR_ALERT_COLD     2
 // Not used #define FIREDOOR_ALERT_LOWPRESS 4
 
-#define FIREDOOR_CLOSED_MOD	0.8
-
 /obj/machinery/door/firedoor
 	name = "\improper Emergency Shutter"
 	desc = "Emergency air-tight shutter, capable of sealing off breached areas."
@@ -66,8 +64,9 @@ var/global/list/alert_overlays_global = list()
 	req_one_access = list(access_atmospherics, access_engine_equip)
 	opacity = 0
 	density = 0
-	layer = DOOR_LAYER - 0.2
-	base_layer = DOOR_LAYER - 0.2
+	layer = BELOW_TABLE_LAYER
+	open_layer = BELOW_TABLE_LAYER
+	closed_layer = ABOVE_DOOR_LAYER
 
 	dir = 2
 
@@ -189,7 +188,6 @@ var/global/list/alert_overlays_global = list()
 			var/mob/M = mecha.occupant
 			attack_hand(M)
 	return 0
-
 
 /obj/machinery/door/firedoor/power_change()
 	if(powered(ENVIRON))
@@ -318,7 +316,7 @@ var/global/list/alert_overlays_global = list()
 		return
 	..()
 	latetoggle()
-	layer = base_layer
+	layer = open_layer
 	var/area/A = get_area_master(src)
 	ASSERT(istype(A)) // This worries me.
 	var/alarmed = A.doors_down || A.fire
@@ -355,7 +353,7 @@ var/global/list/alert_overlays_global = list()
 		return
 	..()
 	latetoggle()
-	layer = base_layer + FIREDOOR_CLOSED_MOD
+	layer = closed_layer
 
 /obj/machinery/door/firedoor/door_animate(animation)
 	switch(animation)
@@ -363,7 +361,6 @@ var/global/list/alert_overlays_global = list()
 			flick("door_opening", src)
 		if("closing")
 			flick("door_closing", src)
-	return
 
 
 /obj/machinery/door/firedoor/update_icon()
@@ -473,7 +470,7 @@ var/global/list/alert_overlays_global = list()
 	flags = ON_BORDER
 
 /obj/machinery/door/firedoor/border_only/Cross(atom/movable/mover, turf/target, height=1.5, air_group = 0)
-	if(istype(mover) && mover.checkpass(PASSGLASS))
+	if(istype(mover) && (mover.checkpass(PASSDOOR|PASSGLASS)))
 		return 1
 	if(get_dir(loc, target) == dir || get_dir(loc, mover) == dir)
 		return !density
@@ -485,14 +482,15 @@ var/global/list/alert_overlays_global = list()
 
 
 /obj/machinery/door/firedoor/border_only/Uncross(atom/movable/mover as mob|obj, turf/target as turf)
-	if(istype(mover) && mover.checkpass(PASSGLASS))
+	if(istype(mover) && (mover.checkpass(PASSDOOR|PASSGLASS)))
 		return 1
 	if(flags & ON_BORDER)
 		if(target) //Are we doing a manual check to see
 			if(get_dir(loc, target) == dir)
 				return !density
 		else if(mover.dir == dir) //Or are we using move code
-			if(density)	mover.Bump(src)
+			if(density)
+				mover.Bump(src)
 			return !density
 	return 1
 

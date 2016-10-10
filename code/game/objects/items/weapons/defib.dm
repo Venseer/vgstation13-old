@@ -11,7 +11,7 @@
 	w_class = W_CLASS_MEDIUM
 	force = 5
 	throwforce = 5
-	origin_tech = "biotech=3"
+	origin_tech = Tc_BIOTECH + "=3"
 
 	var/datum/effect/effect/system/spark_spread/sparks = new
 	var/charges = 10
@@ -53,7 +53,8 @@
 			playsound(get_turf(src),'sound/items/defib.ogg',50,1)
 			user.Weaken(5)
 			var/mob/living/carbon/human/H = user
-			if(ishuman(user)) H.apply_damage(20, BURN)
+			if(ishuman(user))
+				H.apply_damage(20, BURN)
 			charges--
 			update_icon()
 		else
@@ -151,15 +152,16 @@
 			var/mob/dead/observer/ghost = get_ghost_from_mind(target.mind)
 			if(ghost && ghost.client && ghost.can_reenter_corpse)
 				ghost << 'sound/effects/adminhelp.ogg'
-				to_chat(ghost, "<span class='interface'><b><font size = 3>Someone is trying to revive your body. Return to it if you want to be resurrected!</b> \
-					(Verbs -> Ghost -> Re-enter corpse, or <a href='?src=\ref[ghost];reentercorpse=1'>click here!</a>)</font></span>")
+				to_chat(ghost, "<span class='interface big'><span class='bold'>Someone is trying to revive your body. Return to it if you want to be resurrected!</span> \
+					(Verbs -> Ghost -> Re-enter corpse, or <a href='?src=\ref[ghost];reentercorpse=1'>click here!</a>)</span>")
 				to_chat(user, "<span class='warning'>[src] buzzes: Defibrillation failed. Vital signs are too weak, please try again in five seconds.</span>")
 				return
 			//we couldn't find a suitable ghost.
 			target.visible_message("<span class='warning'>[src] buzzes: Defibrillation failed. Patient's condition does not allow reviving.</span>")
 			return
 		var/datum/organ/internal/heart/heart = target.internal_organs_by_name["heart"]
-		if(prob(25)) heart.damage += 5 //Allow the defibrilator to possibly worsen heart damage. Still rare enough to just be the "clone damage" of the defib
+		if(prob(25))
+			heart.damage += 5 //Allow the defibrilator to possibly worsen heart damage. Still rare enough to just be the "clone damage" of the defib
 		target.apply_damage(-target.getOxyLoss(),OXY)
 		target.updatehealth()
 		target.visible_message("<span class='danger'>[target]'s body convulses a bit.</span>")

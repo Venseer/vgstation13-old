@@ -423,7 +423,7 @@
 	name = "Jump"
 	desc = "Leap great distances!"
 	panel = "Mutant Powers"
-	range = -1
+	range = SELFCAST
 
 	charge_type = Sp_RECHARGE
 	charge_max = 60
@@ -469,12 +469,14 @@
 				continue
 
 			var/prevLayer = target.layer
-			target.layer = 9
+			target.plane = EFFECTS_PLANE
 
 			for(var/i=0, i<duration, i++)
 				step(target, target.dir)
-				if(i < 5) target.pixel_y += 8
-				else target.pixel_y -= 8
+				if(i < 5)
+					target.pixel_y += 8 * PIXEL_MULTIPLIER
+				else
+					target.pixel_y -= 8 * PIXEL_MULTIPLIER
 				sleep(1)
 			target.pixel_y = 0
 
@@ -496,8 +498,8 @@
 			var/wiggle = 6
 			while(wiggle > 0)
 				wiggle--
-				container.pixel_x = rand(-3,3)
-				container.pixel_y = rand(-3,3)
+				container.pixel_x = rand(-3,3) * PIXEL_MULTIPLIER
+				container.pixel_y = rand(-3,3) * PIXEL_MULTIPLIER
 				sleep(1)
 			container.pixel_x = 0
 			container.pixel_y = 0
@@ -598,22 +600,22 @@
 	var/mob/living/carbon/M = targets[1] //only one mob in the list, so we want that one
 
 	if(!M || !M.loc) //Either chose to not read a mind or the mob was caught by qdel
-		return
+		return 1
 
 	if(!istype(M))
 		to_chat(user, "<span class='warning'>This can only be used on carbon beings.</span>")
-		return
+		return 1
 
 	if (M_PSY_RESIST in M.mutations)
 		to_chat(user, "<span class='warning'>You can't see into [M.name]'s mind at all!</span>")
-		return
+		return 1
 
 	if (M.stat == 2)
 		to_chat(user, "<span class='warning'>[M.name] is dead and cannot have their mind read.</span>")
-		return
+		return 1
 	if (M.health < 0)
 		to_chat(user, "<span class='warning'>[M.name] is dying, and their thoughts are too scrambled to read.</span>")
-		return
+		return 1
 
 	to_chat(user, "<span class='notice'><b>Mind Reading of [M.name]:</b></span>")
 	var/pain_condition = M.health

@@ -21,7 +21,7 @@ log transactions
 	anchored = 1
 	use_power = 1
 	idle_power_usage = 10
-	layer = 2.9//keep hiding those bills!
+	layer = BELOW_OBJ_LAYER
 	var/datum/money_account/authenticated_account
 	var/number_incorrect_tries = 0
 	var/previous_account_number = 0
@@ -446,7 +446,7 @@ log transactions
 					playsound(loc, 'sound/items/polaroid2.ogg', 50, 1)
 			if("insert_card")
 				if(held_card)
-					held_card.loc = src.loc
+					held_card.forceMove(src.loc)
 					authenticated_account = null
 
 					if(ishuman(usr) && !usr.get_active_hand())

@@ -83,7 +83,8 @@
 		to_chat(user, "<span class='warning'>\The [src] doesn't have enough metal to complete this task.</span>")
 		return 1
 
-	if(alert(user, "Do you wish to be turned into a MoMMI at this position?", "Confirm", "Yes", "No") != "Yes") return
+	if(alert(user, "Do you wish to be turned into a MoMMI at this position?", "Confirm", "Yes", "No") != "Yes")
+		return
 
 	building=1
 	update_icon()
@@ -137,11 +138,13 @@
 				return TRUE
 
 /obj/machinery/mommi_spawner/proc/makeMoMMI(var/mob/user)
-	if(!user.client) return // Player has already been made into another mob before this one spawned, so don't make a new one
+	if(!user.client)
+		return // Player has already been made into another mob before this one spawned, so don't make a new one
 	var/turf/T = get_turf(src)
 
 	var/mob/living/silicon/robot/mommi/M = new /mob/living/silicon/robot/mommi(T)
-	if(!M)	return
+	if(!M)
+		return
 
 	M.invisibility = 0
 	if (locked_to_zlevel)
@@ -159,7 +162,7 @@
 
 	//M.cell = locate(/obj/item/weapon/cell) in contents
 	//M.cell.loc = M
-	user.loc = M//Should fix cybros run time erroring when blown up. It got deleted before, along with the frame.
+	user.forceMove(M)//Should fix cybros run time erroring when blown up. It got deleted before, along with the frame.
 
 	M.mmi = new /obj/item/device/mmi(M)
 	M.mmi.transfer_identity(user)

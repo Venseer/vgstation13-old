@@ -7,7 +7,7 @@
 	opacity = 0
 	density = 0
 	anchored = 0.0
-	origin_tech = "materials=2"
+	origin_tech = Tc_MATERIALS + "=2"
 	var/darts = 5
 	w_class = W_CLASS_SMALL
 
@@ -119,7 +119,7 @@
 	if(cartridge)
 		to_chat(usr, "<span class='notice'>You pop the cartridge out of [src].</span>")
 		var/obj/item/weapon/dart_cartridge/C = cartridge
-		C.loc = get_turf(src)
+		C.forceMove(get_turf(src))
 		C.update_icon()
 		cartridge = null
 		src.update_icon()
@@ -163,14 +163,18 @@
 		playsound(user.loc, 'sound/weapons/dartgun.ogg', 50, 1)
 
 		for(var/i=0, i<6, i++)
-			if(!D) break
-			if(D.loc == trg) break
+			if(!D)
+				break
+			if(D.loc == trg)
+				break
 			step_towards(D,trg)
 
 			if(D)
 				for(var/mob/living/carbon/M in D.loc)
-					if(!istype(M,/mob/living/carbon)) continue
-					if(M == user) continue
+					if(!istype(M,/mob/living/carbon))
+						continue
+					if(M == user)
+						continue
 					//Syringe gun attack logging by Yvarov
 					var/R
 					if(ishuman(M))
@@ -205,7 +209,8 @@
 					break
 			if(D)
 				for(var/atom/A in D.loc)
-					if(A == user) continue
+					if(A == user)
+						continue
 					if(A.density)
 						qdel(D)
 						D = null
@@ -303,7 +308,7 @@
 				to_chat(usr, "You remove [B] from [src].")
 				mixing -= B
 				beakers -= B
-				B.loc = get_turf(src)
+				B.forceMove(get_turf(src))
 	else if (href_list["eject_cart"])
 		remove_cartridge()
 	else if (href_list["close"])

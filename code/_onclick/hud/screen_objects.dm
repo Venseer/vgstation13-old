@@ -9,13 +9,12 @@
 /obj/screen
 	name = ""
 	icon = 'icons/mob/screen1.dmi'
-	layer = 20.0
-	unacidable = 1
+	layer = HUD_BASE_LAYER
 	var/obj/master = null	//A reference to the object in the slot. Grabs or items, generally.
 	var/gun_click_time = -100 //I'm lazy.
 	var/globalscreen = 0 //This screen object is not unique to one screen, can be seen by many
 	appearance_flags = NO_CLIENT_COLOR
-	plane = PLANE_HUD
+	plane = HUD_PLANE
 
 /obj/screen/Destroy()
 	master = null
@@ -60,6 +59,8 @@
 	var/slot_id	//The indentifier for the slot. It has nothing to do with ID cards.
 	var/hand_index
 
+/obj/screen/holomap
+
 /obj/screen/close
 	name = "close"
 	globalscreen = 1
@@ -98,6 +99,12 @@
 	if(overlay != null)
 		overlay.loc = null
 		overlay = null
+
+/obj/screen/item_action/MouseEntered(location,control,params)
+	openToolTip(usr,src,params,title = name,content = desc)
+
+/obj/screen/item_action/MouseExited()
+	closeToolTip(usr)
 
 /obj/screen/item_action/Click()
 	if(!usr || !owner)
@@ -178,6 +185,12 @@
 		icon_state = "gun0"
 		screen_loc = ui_gun_select
 		//dir = 1
+
+/obj/screen/gun/MouseEntered(location,control,params)
+	openToolTip(usr,src,params,title = name,content = desc)
+
+/obj/screen/gun/MouseExited()
+	closeToolTip(usr)
 
 /obj/screen/zone_sel
 	name = "damage zone"
@@ -278,7 +291,8 @@
 	return locate(X, Y, origin.z)
 
 /obj/screen/Click(location, control, params)
-	if(!usr)	return 1
+	if(!usr)
+		return 1
 
 	switch(name)
 		if("toggle")
@@ -747,7 +761,7 @@
 		if("Jump to Blob")
 			if(isovermind(usr) && linked_blob)
 				var/mob/camera/blob/overmind = usr
-				overmind.loc = linked_blob.loc
+				overmind.forceMove(linked_blob.loc)
 	return 1
 
 /obj/screen/inventory/Click()
@@ -779,3 +793,6 @@
 		if(!objects.globalscreen)
 			returnToPool(objects)
 	src.screen = null
+
+/obj/screen/acidable()
+	return 0

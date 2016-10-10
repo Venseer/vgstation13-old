@@ -1,4 +1,4 @@
-//This file was auto-corrected by findeclaration.exe on 25.5.2012 20:42:32
+
 
 var/const/TOUCH = 1
 var/const/INGEST = 2
@@ -55,10 +55,13 @@ var/const/INGEST = 2
 	current_list_element = rand(1,reagent_list.len)
 
 	while(total_transfered != amount)
-		if(total_transfered >= amount) break
-		if(is_empty() || !reagent_list.len) break
+		if(total_transfered >= amount)
+			break
+		if(is_empty() || !reagent_list.len)
+			break
 
-		if(current_list_element > reagent_list.len) current_list_element = 1
+		if(current_list_element > reagent_list.len)
+			current_list_element = 1
 		var/datum/reagent/current_reagent = reagent_list[current_list_element]
 
 		src.remove_reagent(current_reagent.id, 1)
@@ -153,9 +156,9 @@ var/const/INGEST = 2
 		minimal_investigation_log(I_CHEMS, "[whodunnit ? "[key_name(whodunnit)]" : "(N/A, last user processed: [usr.ckey])"] \
 		transferred [english_list(logged_message)] from \a [my_atom] \ref[my_atom] to \a [R.my_atom] \ref[R.my_atom].", prefix=" ([T.x],[T.y],[T.z])")
 		if(adminwarn_message.len)
-			message_admins("[whodunnit ? "[whodunnit] ([whodunnit.ckey]) (<A HREF='?_src_=holder;adminplayeropts=\ref[whodunnit]'>PP</A>) (<A HREF='?_src_=holder;adminmoreinfo=\ref[whodunnit]'>?</A>)" : "(unknown whodunnit, last whodunnit processed: [usr.ckey])"]\
+			message_admins("[whodunnit ? "[key_name_and_info(whodunnit)] " : "(unknown whodunnit, last whodunnit processed: [usr.ckey])"]\
 			has transferred [english_list(adminwarn_message)] from \a [my_atom] (<A HREF='?_src_=vars;Vars=\ref[my_atom]'>VV</A>) to \a [R.my_atom] (<A HREF='?_src_=vars;Vars=\ref[R.my_atom]'>VV</A>).\
-			[whodunnit ? " (<A HREF='?_src_=holder;adminplayerobservecoodjump=1;X=[whodunnit.x];Y=[whodunnit.y];Z=[whodunnit.z]'>JMP</a>)" : ""]")
+			[whodunnit ? " [formatJumpTo(whodunnit)]" : ""]")
 
 	return amount
 
@@ -259,7 +262,8 @@ trans_to_atmos(var/datum/gas_mixture/target, var/amount=1, var/multiplier=1, var
 	return amount
 
 /*
-	if (!target) return
+	if (!target)
+		return
 	var/total_transfered = 0
 	var/current_list_element = 1
 	var/datum/reagents/R = target.reagents
@@ -269,11 +273,15 @@ trans_to_atmos(var/datum/gas_mixture/target, var/amount=1, var/multiplier=1, var
 	current_list_element = rand(1,reagent_list.len) //Eh, bandaid fix.
 
 	while(total_transfered != amount)
-		if(total_transfered >= amount) break //Better safe than sorry.
-		if(total_volume <= 0 || !reagent_list.len) break
-		if(R.total_volume >= R.maximum_volume) break
+		if(total_transfered >= amount)
+			break //Better safe than sorry.
+		if(total_volume <= 0 || !reagent_list.len)
+			break
+		if(R.total_volume >= R.maximum_volume)
+			break
 
-		if(current_list_element > reagent_list.len) current_list_element = 1
+		if(current_list_element > reagent_list.len)
+			current_list_element = 1
 		var/datum/reagent/current_reagent = reagent_list[current_list_element]
 		if(preserve_data)
 			trans_data = current_reagent.data
@@ -318,8 +326,10 @@ trans_to_atmos(var/datum/gas_mixture/target, var/amount=1, var/multiplier=1, var
 	update_total()
 
 /datum/reagents/proc/handle_reactions()
-	if(!my_atom) return //sanity check
-	if(my_atom.flags & NOREACT) return //Yup, no reactions here. No siree.
+	if(!my_atom)
+		return //sanity check
+	if(my_atom.flags & NOREACT)
+		return //Yup, no reactions here. No siree.
 
 	var/reaction_occured = 0
 	do
@@ -349,11 +359,13 @@ trans_to_atmos(var/datum/gas_mixture/target, var/amount=1, var/multiplier=1, var
 				var/list/multipliers = new/list()
 
 				for(var/B in C.required_reagents)
-					if(!has_reagent(B, C.required_reagents[B]))	break
+					if(!has_reagent(B, C.required_reagents[B]))
+						break
 					total_matching_reagents++
 					multipliers += round(get_reagent_amount(B) / C.required_reagents[B])
 				for(var/B in C.required_catalysts)
-					if(!has_reagent(B, C.required_catalysts[B]))	break
+					if(!has_reagent(B, C.required_catalysts[B]))
+						break
 					total_matching_catalysts++
 
 				if(!C.required_container)
@@ -455,7 +467,7 @@ trans_to_atmos(var/datum/gas_mixture/target, var/amount=1, var/multiplier=1, var
 	total_volume = 0
 	amount_cache.len = 0
 	for(var/datum/reagent/R in reagent_list)
-		if(R.volume < 0.1)
+		if(R.volume < R.custom_metabolism/2) //Used to be 0.1, changing this to custom_metabolism/2 to alter balance as little as possible since the default metabolism is 0.2
 			del_reagent(R.id,update_totals=0)
 		else
 			total_volume += R.volume
@@ -502,7 +514,8 @@ trans_to_atmos(var/datum/gas_mixture/target, var/amount=1, var/multiplier=1, var
 /datum/reagents/proc/add_reagent(var/reagent, var/amount, var/list/data=null)
 	if(!my_atom)
 		return 0
-	if(!isnum(amount)) return 1
+	if(!isnum(amount))
+		return 1
 	update_total()
 	if(total_volume + amount > maximum_volume)
 		amount = (maximum_volume - total_volume) //Doesnt fit in. Make it disappear. Shouldn't happen. Will happen.
@@ -568,11 +581,13 @@ trans_to_atmos(var/datum/gas_mixture/target, var/amount=1, var/multiplier=1, var
 
 /datum/reagents/proc/remove_reagent(var/reagent, var/amount, var/safety)//Added a safety check for the trans_id_to
 
-	if(!isnum(amount)) return 1
+	if(!isnum(amount))
+		return 1
 
 	for (var/datum/reagent/R in reagent_list)
 		if (R.id == reagent)
-			if(!R.on_removal(amount)) return 0 //handled and reagent says fuck no
+			if(!R.on_removal(amount))
+				return 0 //handled and reagent says fuck no
 			R.volume -= amount
 			update_total()
 			if(!safety)//So it does not handle reactions when it need not to
@@ -617,7 +632,8 @@ trans_to_atmos(var/datum/gas_mixture/target, var/amount=1, var/multiplier=1, var
 /datum/reagents/proc/get_reagents()
 	var/res = ""
 	for(var/datum/reagent/A in reagent_list)
-		if (res != "") res += ","
+		if (res != "")
+			res += ","
 		res += A.name
 
 	return res
@@ -633,7 +649,8 @@ trans_to_atmos(var/datum/gas_mixture/target, var/amount=1, var/multiplier=1, var
 	return english_list(stuff, "no reagents")
 
 /datum/reagents/proc/remove_all_type(var/reagent_type, var/amount, var/strict = 0, var/safety = 1) // Removes all reagent of X type. @strict set to 1 determines whether the childs of the type are included.
-	if(!isnum(amount)) return 1
+	if(!isnum(amount))
+		return 1
 
 	var/has_removed_reagent = 0
 
@@ -687,6 +704,11 @@ trans_to_atmos(var/datum/gas_mixture/target, var/amount=1, var/multiplier=1, var
 			. += "[R.volume]u of [R.name]"
 
 	return english_list(., nothing_text = "")
+
+/datum/reagents/proc/log_bad_reagents(var/mob/user, var/atom/A)
+	var/badreagents = write_logged_reagents()
+	if(badreagents)
+		add_gamelogs(user, "used \a [A] containing [badreagents]", admin = TRUE, tp_link = TRUE)
 
 /datum/reagents/proc/is_empty()
 	return total_volume <= 0

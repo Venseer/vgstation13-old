@@ -137,7 +137,7 @@
 		to_chat(usr, "<span class='notice'> <B>Subject cannot have abiotic items on.</B></span>")
 		return*/
 	usr.stop_pulling()
-	usr.loc = src
+	usr.forceMove(src)
 	usr.reset_view()
 	src.occupant = usr
 	src.icon_state = "scanner_1"
@@ -247,7 +247,7 @@
 	return ..()
 
 /obj/machinery/dna_scannernew/proc/put_in(var/mob/M)
-	M.loc = src
+	M.forceMove(src)
 	M.reset_view()
 	src.occupant = M
 	src.icon_state = "scanner_1"
@@ -262,10 +262,8 @@
 				if(ghost)
 					if(ghost.client && ghost.can_reenter_corpse)
 						ghost << 'sound/effects/adminhelp.ogg'
-						to_chat(ghost, "<span class='interface'><b><font size = 3>Your corpse has been placed into a cloning scanner. Return to your body if you want to be resurrected/cloned!</b> \
-							(Verbs -> Ghost -> Re-enter corpse, or <a href='?src=\ref[ghost];reentercorpse=1'>click here!</a>)</font></span>")
-					else
-						ghost.canclone = M
+						to_chat(ghost, "<span class='interface big'><span class='bold'>Your corpse has been placed into a cloning scanner. Return to your body if you want to be resurrected/cloned!</span> \
+							(Verbs -> Ghost -> Re-enter corpse, or <a href='?src=\ref[ghost];reentercorpse=1'>click here!</a>)</span>")
 				break
 			break
 	return
@@ -292,6 +290,14 @@
 			C.update_icon()
 
 	return 1
+
+/obj/machinery/dna_scannernew/on_login(var/mob/M)
+	if(M.mind && !M.client && locate(/obj/machinery/computer/cloning) in range(src, 1)) //!M.client = mob has ghosted out of their body
+		var/mob/dead/observer/ghost = get_ghost_from_mind(M.mind)
+		if(ghost && ghost.client)
+			ghost << 'sound/effects/adminhelp.ogg'
+			to_chat(ghost, "<span class='interface big'><span class='bold'>Your corpse has been placed into a cloning scanner. Return to your body if you want to be resurrected/cloned!</span> \
+				(Verbs -> Ghost -> Re-enter corpse, or <a href='?src=\ref[src];reentercorpse=1'>click here!</a>)</span>")
 
 /obj/machinery/dna_scannernew/ex_act(severity)
 	//This is by far the oldest code I have ever seen, please appreciate how it's preserved in comments for distant posterity. Have some perspective of where we came from.
@@ -320,7 +326,7 @@
 		if(3.0)
 			if (prob(25))
 				for(var/atom/movable/A as mob|obj in src)
-					A.loc = src.loc
+					A.forceMove(src.loc)
 					ex_act(severity)
 					//Foreach goto(181)
 				//SN src = null
@@ -424,9 +430,11 @@
 
 /obj/machinery/computer/scan_consolenew/proc/setInjectorBlock(var/obj/item/weapon/dnainjector/I, var/blk, var/datum/dna2/record/buffer)
 	var/pos = findtext(blk,":")
-	if(!pos) return 0
+	if(!pos)
+		return 0
 	var/id = text2num(copytext(blk,1,pos))
-	if(!id) return 0
+	if(!id)
+		return 0
 	I.block = id
 	I.buf = buffer
 	return 1
@@ -797,7 +805,7 @@
 	if(href_list["ejectBeaker"])
 		if(connected.beaker)
 			var/obj/item/weapon/reagent_containers/glass/B = connected.beaker
-			B.loc = connected.loc
+			B.forceMove(connected.loc)
 			connected.beaker = null
 		return 1
 
@@ -847,7 +855,7 @@
 		if (bufferOption == "ejectDisk")
 			if (!src.disk)
 				return
-			src.disk.loc = get_turf(src)
+			src.disk.forceMove(get_turf(src))
 			src.disk = null
 			return 1
 
@@ -956,7 +964,7 @@
 					I.buf = buf
 				waiting_for_user_input=0
 				if(success)
-					I.loc = src.loc
+					I.forceMove(src.loc)
 					I.name += " ([buf.name])"
 					src.injector_ready = 0
 					spawn(connected.injector_cooldown)

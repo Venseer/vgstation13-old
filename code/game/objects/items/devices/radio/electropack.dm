@@ -3,7 +3,7 @@
 	desc = "Dance my monkeys! DANCE!!!"
 	icon_state = "electropack0"
 	item_state = "electropack"
-	origin_tech = "materials=1;powerstorage=2"
+	origin_tech = Tc_MATERIALS + "=1;" + Tc_POWERSTORAGE + "=2"
 	frequency = 1449
 	flags = FPRINT
 	siemens_coefficient = 1
@@ -20,7 +20,8 @@
 		initialize()
 	else
 		spawn(50)
-			if(radio_controller) initialize()
+			if(radio_controller)
+				initialize()
 
 /obj/item/device/radio/electropack/initialize()
 	if(frequency < MINIMUM_FREQUENCY || frequency > MAXIMUM_FREQUENCY)
@@ -61,7 +62,7 @@
 		A.icon = 'icons/obj/assemblies.dmi'
 
 		user.drop_from_inventory(W)
-		W.loc = A
+		W.forceMove(A)
 		W.master = A
 		A.part1 = W
 

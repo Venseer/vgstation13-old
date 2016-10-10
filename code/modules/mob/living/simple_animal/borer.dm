@@ -133,7 +133,8 @@ var/global/borer_unlock_types_leg = typesof(/datum/unlockable/borer/leg) - /datu
 		RemoveAllFactionIcons(mind)
 
 /mob/living/simple_animal/borer/Life()
-	if(timestopped) return 0 //under effects of time magick
+	if(timestopped)
+		return 0 //under effects of time magick
 
 	..()
 	if(host)
@@ -148,6 +149,38 @@ var/global/borer_unlock_types_leg = typesof(/datum/unlockable/borer/leg) - /datu
 
 				if(prob(host.brainloss/20))
 					host.say("*[pick(list("blink","blink_r","choke","aflap","drool","twitch","twitch_s","gasp"))]")
+
+	if(client)
+		regular_hud_updates()
+
+/mob/living/simple_animal/borer/regular_hud_updates()
+	var/severity = 0
+
+	var/healthpercent = (health/maxHealth)*100
+
+	switch(healthpercent)
+		if(100 to INFINITY)
+			healths.icon_state = "borer_health0"
+		if(75 to 100)
+			healths.icon_state = "borer_health1"
+			severity = 2
+		if(50 to 75)
+			healths.icon_state = "borer_health2"
+			severity = 3
+		if(25 to 50)
+			healths.icon_state = "borer_health3"
+			severity = 4
+		if(1 to 25)
+			healths.icon_state = "borer_health4"
+			severity = 5
+		else
+			healths.icon_state = "borer_health5"
+			severity = 6
+
+	if(severity > 0)
+		overlay_fullscreen("damage", /obj/screen/fullscreen/brute, severity)
+	else
+		clear_fullscreen("damage")
 
 /mob/living/simple_animal/borer/proc/update_verbs(var/mode)
 	if(verb_holders.len>0)
@@ -546,7 +579,8 @@ var/global/borer_unlock_types_leg = typesof(/datum/unlockable/borer/leg) - /datu
 
 	spawn(200)
 
-		if((!host && !severed) || !src) return
+		if((!host && !severed) || !src)
+			return
 
 		if(src.stat)
 			to_chat(src, "<span class='warning'>You cannot abandon [host] in your current state.</span>")
@@ -636,7 +670,8 @@ var/global/borer_unlock_types_leg = typesof(/datum/unlockable/borer/leg) - /datu
 	set desc = "Infest a suitable humanoid host."
 
 	var/mob/living/simple_animal/borer/B=mob
-	if(!istype(B)) return
+	if(!istype(B))
+		return
 	B.infest()
 
 /mob/living/simple_animal/borer/proc/limb_to_name(var/limb = null)
@@ -738,9 +773,11 @@ var/global/borer_unlock_types_leg = typesof(/datum/unlockable/borer/leg) - /datu
 
 	var/mob/living/carbon/M = input(src,"Who do you wish to infest?") in null|choices
 
-	if(!M || !src) return
+	if(!M || !src)
+		return
 
-	if(!(src.Adjacent(M))) return
+	if(!(src.Adjacent(M)))
+		return
 
 	var/area = src.zone_sel.selecting
 	var/region = LIMB_HEAD
@@ -816,7 +853,8 @@ var/global/borer_unlock_types_leg = typesof(/datum/unlockable/borer/leg) - /datu
 		to_chat(src, "As [M] moves away, you are dislodged and fall to the ground.")
 		return
 
-	if(!M || !src) return
+	if(!M || !src)
+		return
 
 	if(src.stat)
 		to_chat(src, "You cannot infest a target in your current state.")
@@ -909,13 +947,11 @@ var/global/borer_unlock_types_leg = typesof(/datum/unlockable/borer/leg) - /datu
 	if(isUnconscious())
 		return
 
-	if (layer != TURF_LAYER+0.2)
-		layer = TURF_LAYER+0.2
-		plane = PLANE_TURF
+	if (plane != HIDING_MOB_PLANE)
+		plane = HIDING_MOB_PLANE
 		to_chat(src, text("<span class='notice'>You are now hiding.</span>"))
 	else
-		layer = MOB_LAYER
-		plane = PLANE_MOB
+		plane = MOB_PLANE
 		to_chat(src, text("<span class='notice'>You have stopped hiding.</span>"))
 
 
@@ -992,7 +1028,8 @@ var/global/borer_unlock_types_leg = typesof(/datum/unlockable/borer/leg) - /datu
 
 	shuffle(candidates)
 	for(var/mob/i in candidates)
-		if(!i || !i.client) continue //Dont bother removing them from the list since we only grab one wizard
+		if(!i || !i.client)
+			continue //Dont bother removing them from the list since we only grab one wizard
 		return i
 
 	return 0
@@ -1003,7 +1040,6 @@ var/global/borer_unlock_types_leg = typesof(/datum/unlockable/borer/leg) - /datu
 	if(!candidate)
 		return
 
-	src.mind = candidate.mob.mind
 	src.ckey = candidate.ckey
 	if(src.mind)
 		src.mind.assigned_role = "Borer"
@@ -1059,7 +1095,8 @@ var/global/borer_unlock_types_leg = typesof(/datum/unlockable/borer/leg) - /datu
 		var/dat = ""
 		if(host.reagents.reagent_list.len > 0)
 			for (var/datum/reagent/R in host.reagents.reagent_list)
-				if(R.id == BLOOD) continue // Like we need to know that blood contains blood.
+				if(R.id == BLOOD)
+					continue // Like we need to know that blood contains blood.
 				dat += "\n \t <span class='notice'>[R] ([R.volume] units)</span>"
 		if(dat)
 			to_chat(src, "<span class='notice'>Chemicals found: [dat]</span>")

@@ -22,8 +22,10 @@
 		else
 			if(istype(T,/turf/simulated))
 				continue
-		if(cp<minp)minp=cp
-		if(cp>maxp)maxp=cp
+		if(cp<minp)
+			minp=cp
+		if(cp>maxp)
+			maxp=cp
 	return abs(minp-maxp)
 
 /**
@@ -41,8 +43,10 @@
 		else
 			if(istype(T,/turf/simulated))
 				continue
-		if(cp<minp)minp=cp
-		if(cp>maxp)maxp=cp
+		if(cp<minp)
+			minp=cp
+		if(cp>maxp)
+			maxp=cp
 	return abs(minp-maxp)
 
 
@@ -98,6 +102,9 @@
 
 	// WHY DO WE SMOOTH WITH FALSE R-WALLS WHEN WE DON'T SMOOTH WITH REAL R-WALLS.
 	canSmoothWith = "/turf/simulated/wall=0&/obj/structure/falsewall=0&/obj/structure/falserwall=0"
+
+/obj/structure/falsewall/closed
+	density = 1
 
 /obj/structure/falsewall/New()
 	..()
@@ -237,6 +244,7 @@
 	canSmoothWith = "/turf/simulated/wall=0&/obj/structure/falsewall=0&/obj/structure/falserwall=0"
 
 /obj/structure/falserwall/New()
+	relativewall()
 	relativewall_neighbours()
 	..()
 

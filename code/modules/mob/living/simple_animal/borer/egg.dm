@@ -1,10 +1,13 @@
+// Amount of time between retries for recruits. As to not spam ghosts every minute.
+#define BORER_EGG_RERECRUITE_DELAY 7.5 MINUTES
+
 /obj/item/weapon/reagent_containers/food/snacks/borer_egg
 	name = "borer egg"
 	desc = "A small, gelatinous egg."
 	icon = 'icons/mob/mob.dmi'
 	icon_state = "borer egg-growing"
 	bitesize = 12
-	origin_tech = "biotech=4"
+	origin_tech = Tc_BIOTECH + "=4"
 	mech_flags = MECH_SCAN_FAIL
 	var/grown = 0
 	var/hatching = 0 // So we don't spam ghosts.
@@ -71,7 +74,9 @@
 		qdel(src)
 	else
 		src.visible_message("<span class='notice'>\The [name] calms down.</span>")
-		Grow() // Reset egg, check for hatchability.
+		hatching = FALSE
+		spawn (BORER_EGG_RERECRUITE_DELAY)
+			Grow() // Reset egg, check for hatchability.
 
 
 /obj/item/weapon/reagent_containers/food/snacks/borer_egg/process()
@@ -97,3 +102,5 @@
 	qdel(recruiter)
 	recruiter = null
 	..()
+
+#undef BORER_EGG_RERECRUITE_DELAY

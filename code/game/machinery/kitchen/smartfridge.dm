@@ -4,7 +4,7 @@
 	name = "\improper SmartFridge"
 	icon = 'icons/obj/vending.dmi'
 	icon_state = "smartfridge"
-	layer = 2.9
+	layer = BELOW_OBJ_LAYER
 	density = 1
 	anchored = 1
 	use_power = 1
@@ -23,7 +23,8 @@
 									/obj/item/weapon/grown,
 									/obj/item/seeds/,
 									/obj/item/weapon/reagent_containers/food/snacks/meat,
-									/obj/item/weapon/reagent_containers/food/snacks/egg)
+									/obj/item/weapon/reagent_containers/food/snacks/egg,
+									/obj/item/weapon/reagent_containers/food/condiment)
 
 	machine_flags = SCREWTOGGLE | CROWDESTROY | EJECTNOTDEL
 
@@ -261,8 +262,8 @@
 	else if(istype(O, /obj/item/weapon/paper) && user.drop_item(O, src.loc))
 		var/list/params_list = params2list(params)
 		if(O.loc == src.loc && params_list.len)
-			var/clamp_x = 16
-			var/clamp_y = 16
+			var/clamp_x = WORLD_ICON_SIZE/2
+			var/clamp_y = WORLD_ICON_SIZE/2
 			O.pixel_x = Clamp(text2num(params_list["icon-x"]) - clamp_x, -clamp_x, clamp_x)
 			O.pixel_y = Clamp(text2num(params_list["icon-y"]) - clamp_y, -clamp_y, clamp_y)
 			to_chat(user, "<span class='notice'>You hang \the [O.name] on the fridge.</span>")
