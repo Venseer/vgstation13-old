@@ -145,6 +145,19 @@
 		to_chat(usr, "You dig your claws deeply into the flooring, bracing yourself.")
 
 
+// Vox Trader -- Same stats as civ gear, but looks like raiders.
+/obj/item/clothing/suit/space/vox/civ/trader
+	name = "alien pressure suit"
+	icon_state = "vox-pressure"
+	item_state = "vox-pressure"
+	desc = "A huge, pressurized suit, designed for distinctly nonhuman proportions. It looks unusually cheap, even for Vox."
+
+/obj/item/clothing/head/helmet/space/vox/civ/trader
+	name = "alien helmet"
+	icon_state = "vox-pressure"
+	item_state = "vox-pressure"
+	desc = "Hey, wasn't this a prop in \'The Abyss\'?"
+
 // Vox Casual
 // Civvie
 /obj/item/clothing/suit/space/vox/civ
@@ -351,7 +364,7 @@
 
 /obj/item/clothing/suit/space/vox/civ/medical/paramedic
 	name = "vox paramedic pressure suit"
-	desc = "A cheap and oddly-shaped pressure suit made for vox crewmembers. This one is for paramedics"
+	desc = "A cheap and oddly-shaped pressure suit made for vox crewmembers. This one is for paramedics."
 	icon_state = "vox-civ-paramedic"
 
 /obj/item/clothing/head/helmet/space/vox/civ/medical/paramedic
