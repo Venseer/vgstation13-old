@@ -164,7 +164,7 @@ var/global/list/damage_icon_parts = list()
 
 			var/icon/DI
 
-			DI = get_damage_icon_part(O.damage_state, O.icon_name, (species.blood_color == "#A10808" ? "" : species.blood_color))
+			DI = get_damage_icon_part(O.damage_state, O.icon_name, (species.blood_color == DEFAULT_BLOOD ? "" : species.blood_color))
 
 			standing_image.overlays += DI
 	var/obj/Overlays/O = obj_overlays[DAMAGE_LAYER]
@@ -433,7 +433,7 @@ var/global/list/damage_icon_parts = list()
 
 	if(dna)
 		switch(dna.mutantrace)
-			if("golem","slime","shadow","adamantine","coalgolem")
+			if("slime","shadow")
 				if(species && (!species.override_icon && species.has_mutant_race))
 					var/obj/Overlays/O = obj_overlays[MUTANTRACE_LAYER]
 					O.icon = 'icons/effects/genetics.dmi'
@@ -762,7 +762,7 @@ var/global/list/damage_icon_parts = list()
 				break
 
 		if(S.name in I.species_fit) //Allows clothes to display differently for multiple species
-			if(S.gloves_icons)
+			if(S.shoes_icons)
 				O.icon = S.shoes_icons
 
 		O.overlays.len = 0

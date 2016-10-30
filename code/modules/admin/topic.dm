@@ -1960,6 +1960,11 @@
 		if(!isobserver(usr))
 			C.admin_ghost()
 		sleep(2)
+		if(!isobserver(usr))
+			return
+		var/mob/dead/observer/O = usr
+		if(O.locked_to)
+			O.manual_stop_follow(O.locked_to)
 		if(C)
 			C.jumptomob(M)
 
@@ -2888,7 +2893,7 @@
 									if(F.lava)
 										var/safe = 0
 										for(var/obj/structure/O in F.contents)
-											if(O.level > F.level && !istype(O, /obj/structure/window)) // Something to stand on and it isn't under the floor!
+											if(O.level > 1 && !istype(O, /obj/structure/window)) // Something to stand on and it isn't under the floor!
 												safe = 1
 												break
 										if(!safe)

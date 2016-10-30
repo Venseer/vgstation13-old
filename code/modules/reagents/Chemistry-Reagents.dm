@@ -212,7 +212,7 @@
 	color = "#a00000" //rgb: 160, 0, 0
 
 	data = new/list("donor"= null, "viruses" = null, "blood_DNA" = null, "blood_type" = null, \
-	"blood_colour" = "#A10808", "resistances" = null, "trace_chem" = null, "antibodies" = null)
+	"blood_colour" = DEFAULT_BLOOD, "resistances" = null, "trace_chem" = null, "antibodies" = null)
 
 /datum/reagent/blood/reaction_mob(var/mob/living/M, var/method = TOUCH, var/volume)
 
@@ -457,16 +457,7 @@
 		return 1
 
 	if(volume >= 1)
-		if(T.wet >= 2)
-			return
-		T.wet = 2
-		spawn(800)
-			if(!istype(T))
-				return
-			T.wet = 0
-			if(T.wet_overlay)
-				T.overlays -= T.wet_overlay
-				T.wet_overlay = null
+		T.wet(800, TURF_WET_LUBE)
 
 /datum/reagent/anti_toxin
 	name = "Anti-Toxin (Dylovene)"
@@ -671,6 +662,7 @@
 				C.mind.transfer_to(new_mob)
 			else
 				new_mob.key = C.key
+			C.transferBorers(new_mob)
 			qdel(C)
 
 /datum/reagent/stoxin

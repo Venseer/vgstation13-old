@@ -217,10 +217,7 @@
 //List of active diseases
 
 	var/viruses = list() // replaces var/datum/disease/virus
-
-//Monkey/infected mode
 	var/list/resistances = list()
-	var/datum/disease/virus = null
 
 	mouse_drag_pointer = MOUSE_ACTIVE_POINTER
 
@@ -279,8 +276,6 @@
 	var/event/on_uattack
 	var/event/on_logout
 	var/event/on_damaged
-
-	forceinvertredraw = 1
 
 	var/list/alphas = list()
 	var/spell_channeling

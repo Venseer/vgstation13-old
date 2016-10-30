@@ -94,7 +94,7 @@ var/global/list/whitelisted_species = list("Human")
 
 	var/list/abilities = list()	// For species-derived or admin-given powers
 
-	var/blood_color = "#A10808" //Red.
+	var/blood_color = DEFAULT_BLOOD //Red.
 	var/flesh_color = "#FFC896" //Pink.
 	var/base_color      //Used when setting species.
 	var/uniform_icons       = 'icons/mob/uniform.dmi'
@@ -109,6 +109,7 @@ var/global/list/whitelisted_species = list("Human")
 	var/fat_wear_suit_icons = 'icons/mob/suit_fat.dmi'
 	var/wear_mask_icons     = 'icons/mob/mask.dmi'
 	var/back_icons          = 'icons/mob/back.dmi'
+	var/id_icons            = 'icons/mob/ids.dmi'
 
 
 	//Used in icon caching.

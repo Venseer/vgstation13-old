@@ -1,6 +1,5 @@
 /turf
 	icon = 'icons/turf/floors.dmi'
-	level = 1.0
 	plane = TURF_PLANE
 	layer = TURF_LAYER_MEME_NAME_BECAUSE_CELT_IS_A_FUCKING_RETARD
 	luminosity = 0
@@ -22,7 +21,6 @@
 	var/temperature = T20C
 
 	var/blocks_air = 0
-	var/icon_old = null
 
 	//associated PathNode in the A* algorithm
 	var/PathNode/PNode = null
@@ -30,8 +28,7 @@
 	// Bot shit
 	var/targetted_by=null
 
-	// Decal shit.
-	var/list/decals
+	var/list/turfdecals
 
 	// Flick animation shit
 	var/atom/movable/overlay/c_animation = null
@@ -41,9 +38,6 @@
 
 	// holy water
 	var/holy = 0
-
-	// wizard sleep spell probably better way to do this
-	var/sleeping = 0
 
 	// left by bullets that went all the way through
 	var/bullet_marks = 0
@@ -62,7 +56,6 @@
 	//See code/datums/shuttle.dm @ 544
 	var/preserve_underlay = 0
 
-	forceinvertredraw = 1
 
 	// This is the placed to store data for the holomap.
 	var/list/image/holomap_data
@@ -96,10 +89,6 @@
 	if(usr.stat || usr.restrained() || usr.lying)
 		return ..()
 	return ..()
-
-/turf/Click()
-	if(!isAI(usr))
-		..()
 
 /turf/ex_act(severity)
 	return 0
@@ -143,8 +132,8 @@
 			if(objects > loopsanity)
 				break
 			objects++
-			spawn( 0 )
-				if ((A && Obj) && Obj.flags & PROXMOVE)
+			if(Obj.flags & PROXMOVE)
+				spawn( 0 )
 					Obj.HasProximity(A, 1)
 	// THIS IS NOW TRANSIT STUFF
 	if ((!(A) || src != A.loc))
@@ -410,20 +399,20 @@
 	update_holomap_planes() // But we might need to recalculate it.
 
 /turf/proc/AddDecal(const/image/decal)
-	if(!decals)
-		decals = new
+	if(!turfdecals)
+		turfdecals = new
 
-	decals += decal
+	turfdecals += decal
 	overlays += decal
 
 /turf/proc/ClearDecals()
-	if(!decals)
+	if(!turfdecals)
 		return
 
-	for(var/image/decal in decals)
+	for(var/image/decal in turfdecals)
 		overlays -= decal
 
-	decals = 0
+	turfdecals.len = 0
 
 
 //Commented out by SkyMarshal 5/10/13 - If you are patching up space, it should be vacuum.

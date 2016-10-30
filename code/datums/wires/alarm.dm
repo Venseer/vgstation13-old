@@ -21,6 +21,8 @@ var/const/AALARM_WIRE_AALARM = 16
 
 
 /datum/wires/alarm/CanUse(var/mob/living/L)
+	if(!..())
+		return 0
 	var/obj/machinery/alarm/A = holder
 	if(A.wiresexposed)
 		return 1
@@ -46,8 +48,8 @@ var/const/AALARM_WIRE_AALARM = 16
 //			to_chat(world, "Power wire cut")
 
 		if (AALARM_WIRE_AI_CONTROL)
-			if (A.aidisabled == !mended)
-				A.aidisabled = mended
+			if (A.aidisabled == mended)
+				A.aidisabled = !mended
 //				to_chat(world, "AI Control Wire Cut")
 
 		if(AALARM_WIRE_SYPHON)

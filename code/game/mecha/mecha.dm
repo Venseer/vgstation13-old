@@ -558,7 +558,7 @@
 			src.occupant_message("<span class='notice'>The [user]'s attack is stopped by the armor.</span>")
 			visible_message("<span class='notice'>The [user] rebounds off [src.name]'s armor!</span>")
 			user.attack_log += text("\[[time_stamp()]\] <font color='red'>attacked [src.name]</font>")
-	return
+	user.delayNextAttack(10)
 
 /obj/mecha/hitby(atom/movable/A as mob|obj) //wrapper
 	src.log_message("Hit by [A].",1)
@@ -618,12 +618,12 @@
 			loc.Exited(src)
 		loc = null
 		if(T)
-			if(istype(src, /obj/mecha/working/ripley/))
-				var/obj/mecha/working/ripley/R = src
-				if(R.cargo)
-					for(var/obj/O in R.cargo) //Dump contents of stored cargo
+			if(istype(src, /obj/mecha/working/))
+				var/obj/mecha/working/W = src
+				if(W.cargo)
+					for(var/obj/O in W.cargo) //Dump contents of stored cargo
 						O.forceMove(T)
-						R.cargo -= O
+						W.cargo -= O
 						T.Entered(O)
 
 			if(prob(30))

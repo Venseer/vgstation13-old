@@ -69,7 +69,7 @@
 	abbreviation = "CT"
 	spawned_items = list(/obj/item/weapon/antag_spawner/contract)
 	price = APPRENTICE_PRICE
-	
+
 /datum/spellbook_artifact/bundle
 	name = "Spellbook Bundle"
 	desc = "Feeling adventurous? Buy this bundle and recieve seven random spellbooks! Who knows what spells you will get? (Warning, each spell book may only be used once! No refunds)."
@@ -108,6 +108,22 @@
 
 	H.rightandwrong(0)
 	to_chat(H, "<span class='userdanger'>You have summoned guns.</span>")
+	
+//SUMMON MAGIC
+/datum/spellbook_artifact/summon_magic
+	name = "Summon Magic"
+	desc = "Share the power of magic with the crew and turn them against each other. Or just empower them against you."
+	abbreviation = "SM"
+
+/datum/spellbook_artifact/summon_magic/can_buy()
+	//Can't summon magic during ragin' mages
+	return !ticker.mode.rage
+
+/datum/spellbook_artifact/summon_magic/purchased(mob/living/carbon/human/H)
+	..()
+
+	H.rightandwrong(1)
+	to_chat(H, "<span class='userdanger'>You have shared the gift of magic with everyone.</span>")
 
 //SANTA BUNDLE
 
@@ -143,7 +159,7 @@
 	H.add_spell(new/spell/aoe_turf/conjure/snowmobile)
 	H.add_spell(new/spell/targeted/wrapping_paper)
 	H.add_spell(new/spell/aoe_turf/conjure/gingerbreadman)
-	H.add_spell(new/spell/targeted/flesh_to_coal)
+//	H.add_spell(new/spell/targeted/flesh_to_coal)
 
 	to_chat(world,'sound/misc/santa.ogg')
 	SetUniversalState(/datum/universal_state/christmas)
