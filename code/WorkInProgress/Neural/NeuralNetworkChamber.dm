@@ -5,8 +5,8 @@
 	name = "Neural-link Control Pod"
 	desc = "An enclosed capsule used for remote-control of synthetic machines compatible with the positronic standard."
 
-  icon = 'icons/obj/machines/controller_pod.dmi'
-  icon_state = "pod_open"
+	icon = 'icons/obj/machines/controller_pod.dmi'
+	icon_state = "pod_open"
 
 	density = 1
 	anchored = 1
@@ -24,11 +24,10 @@
 	eject_button.pod_master = src
 
 /obj/machinery/neural_network_pod/Destroy()
-  eject_mob()
-  if(robot)
-    robot = null
+	eject_mob()
+	if(robot)
+		robot = null
 	..()
-
 
 /obj/machinery/neural_network_pod/wrenchAnchor(mob/user)
 	if(occupant)
@@ -40,10 +39,10 @@
 	if(occupant)
 		user.show_message("<span class='danger'>You force \the [src]'s emergency ejection procedures.</span>")
 		if(robot)
-      occupant.show_message("<span class='danger'>You feel like your brain is being ripped in half.</span>")
+			occupant.show_message("<span class='danger'>You feel like your brain is being ripped in half.</span>")
 			occupant.adjustBrainLoss(POD_BIG_FEEDBACK)
 			occupant.Stun(5)
-    eject_mob()
+		eject_mob()
 		return 1
 	return -1
 
@@ -76,10 +75,12 @@
 
 	if(occupant.mind)
 		occupant.mind.transfer_to(robot)
+		robot.neural_mmi.currentUser = occupant
+		robot.neural_mmi.active = 1
 
-		if(brainmob.client)
-			brainmob.client.screen.Add(eject_button)
-		brainmob << "<span class='notice'>Neural link successfully established.</span>"
+		if(robot.client)
+			robot.client.screen.Add(eject_button)
+		robot << "<span class='notice'>Neural link successfully established.</span>"
 	else
 		if(occupant.client)
 			occupant.client.screen.Add(eject_button)
@@ -91,8 +92,8 @@
 	if(robot)
 		if(robot.mind)
 			robot.mind.transfer_to(occupant)
-      robot.mmi.currentUser = null
-      robot.mmi.active = 0
+			robot.neural_mmi.currentUser = null
+			robot.neural_mmi.active = 0
 
 	if(occupant && occupant.client)
 		occupant.client.screen.Remove(eject_button)
@@ -106,7 +107,7 @@
 	else if (wearer == robot)
 		if(occupant)
 			occupant.adjustBrainLoss(POD_SMALL_FEEDBACK)
-			brainmob << "<span class='danger' class='big'>Your neural connection feedbacks!</span>"
+			robot << "<span class='danger' class='big'>Your neural connection feedbacks!</span>"
 			eject_mob()
 
 /obj/machinery/neural_network_pod/proc/connect_brain(var/mob/living/silicon/robot/neural_robot/linked_robot)
@@ -120,7 +121,6 @@
 /obj/screen/eject_button
 	icon = 'icons/obj/machines/controller_pod.dmi'
 	icon_state = "eject_button"
-
 	screen_loc = "14:0,14:16"
 
 	var/obj/machinery/neural_network_pod/pod_master = null
@@ -128,6 +128,3 @@
 /obj/screen/eject_button/Click()
 	if(pod_master)
 		pod_master.eject_mob()
-
-/obj/screen/eject_button/pool_on_reset()
-	. = 0
