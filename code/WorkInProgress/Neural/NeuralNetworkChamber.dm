@@ -17,6 +17,7 @@
 	var/mob/living/silicon/robot/neural_robot/robot = null
 
 	var/obj/screen/eject_button/eject_button
+	var/obj/item/device/neural_reference/reference_occupant
 
 /obj/machinery/neural_network_pod/New()
 	..()
@@ -69,6 +70,13 @@
 		new_occupant.show_message("\The [src] beeps: \"No sinal connected!\"", 1)
 		return
 
+	//START Adding something to make up for my lack of programming skills
+	reference_occupant = new (new_occupant)
+	reference_occupant.pod_reference = src
+	reference_occupant.mob_reference = new_occupant
+	reference_occupant.loc = new_occupant
+	//END
+
 	occupant = new_occupant
 	new_occupant.forceMove(src)
 	icon_state = "pod_closed"
@@ -90,7 +98,7 @@
 		AM.forceMove(get_turf(src))
 
 	if(robot)
-		if(robot.mind)
+		if(robot.mind && occupant)
 			robot.mind.transfer_to(occupant)
 			robot.neural_mmi.currentUser = null
 			robot.neural_mmi.active = 0
@@ -98,23 +106,19 @@
 	if(occupant && occupant.client)
 		occupant.client.screen.Remove(eject_button)
 
+	qdel(reference_occupant)
 	occupant = null
+	eject_button.pod_master = src //for some reason the button resets every time you eject
 	icon_state = "pod_open"
-
-/obj/machinery/neural_network_pod/proc/mob_death(wearer) //the brain died or the occupant died
-	if(wearer == occupant)
-		eject_mob()
-	else if (wearer == robot)
-		if(occupant)
-			occupant.adjustBrainLoss(POD_SMALL_FEEDBACK)
-			robot << "<span class='danger' class='big'>Your neural connection feedbacks!</span>"
-			eject_mob()
 
 /obj/machinery/neural_network_pod/proc/connect_brain(var/mob/living/silicon/robot/neural_robot/linked_robot)
 	if(!linked_robot || !istype(linked_robot))
-		return
-
+		return 0
+	if(linked_robot.neural_mmi.active)
+		return 0
 	robot = linked_robot
+	robot.neural_mmi.pod = src
+	return 1
 
 /*Eject Button*/
 
@@ -128,3 +132,17 @@
 /obj/screen/eject_button/Click()
 	if(pod_master)
 		pod_master.eject_mob()
+
+/*Neural Reference*/
+/*HAAAAAAAAACKS :^)*/
+/obj/item/device/neural_reference
+	var/obj/machinery/neural_network_pod/pod_reference = null
+	var/mob/living/mob_reference = null
+
+/obj/item/device/neural_reference/process()
+	if(src.loc != mob_reference)
+		qdel(src)
+
+/obj/item/device/neural_reference/OnMobDeath(var/mob/M)
+	if(src.pod_reference.occupant && src.mob_reference == src.pod_reference.occupant)
+		src.pod_reference.eject_mob()

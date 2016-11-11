@@ -6,6 +6,7 @@
 	var/active = 0
 	var/mob/living/silicon/installedCyborg = null
 	var/mob/living/currentUser = null
+	var/obj/machinery/neural_network_pod/pod = null
 
 /obj/item/device/neural_brain/afterattack(atom/target, mob/user, proximity_flag)
 	if(!istype(target, /obj/item/robot_parts/robot_suit))
@@ -27,10 +28,17 @@
 			var/datum/robot_component/cell_component = nerual_robot.components["power cell"]
 			cell_component.wrapped = nerual_robot.cell
 			cell_component.installed = 1
-		nerual_robot.mmi = src
+		nerual_robot.neural_mmi = src
 		installedCyborg = nerual_robot
 		active = 1
 		qdel(robot)
 		user.drop_item(src, nerual_robot)
 	else
 		to_chat(user, "<span class='notice'>This robot does not seem to be done. You need all parts to be in place in order to insert the artificial brain.</span>")
+
+/obj/item/device/neural_brain/OnMobDeath(var/mob/user)
+	if(active && currentUser && pod)
+		pod.eject_mob()
+	active = 0
+	installedCyborg = null
+	currentUser = null
