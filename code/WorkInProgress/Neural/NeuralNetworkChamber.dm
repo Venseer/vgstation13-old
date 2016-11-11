@@ -111,6 +111,12 @@
 	eject_button.pod_master = src //for some reason the button resets every time you eject
 	icon_state = "pod_open"
 
+/obj/machinery/neural_network_pod/proc/robot_death()
+	if(occupant)
+		occupant.adjustBrainLoss(20)
+		robot << "<span class='danger' class='big'>Your neural connection feedbacks!</span>"
+		eject_mob()
+
 /obj/machinery/neural_network_pod/proc/connect_brain(var/mob/living/silicon/robot/neural_robot/linked_robot)
 	if(!linked_robot || !istype(linked_robot))
 		return 0

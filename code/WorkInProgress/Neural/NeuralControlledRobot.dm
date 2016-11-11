@@ -12,3 +12,11 @@
 
 /mob/living/silicon/robot/neural_robot/proc/check_avaibility()
 	return usable_brain() && neural_mmi.active == 0
+
+/mob/living/silicon/robot/neural_robot/death(gibbed)
+	neural_mmi.pod.robot_death()
+	..(gibbed)
+
+/mob/living/silicon/robot/neural_robot/gib()
+	neural_mmi.pod.robot_death()
+	..()
