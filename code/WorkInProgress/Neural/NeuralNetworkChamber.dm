@@ -85,6 +85,7 @@
 		occupant.mind.transfer_to(robot)
 		robot.neural_mmi.currentUser = occupant
 		robot.neural_mmi.active = 1
+		robot.neural_mmi.pod = src
 
 		if(robot.client)
 			robot.client.screen.Add(eject_button)
@@ -114,8 +115,13 @@
 /obj/machinery/neural_network_pod/proc/robot_death()
 	if(occupant)
 		occupant.adjustBrainLoss(20)
-		robot << "<span class='danger' class='big'>Your neural connection feedbacks!</span>"
+		robot.show_message("<span class='danger' class='big'>Your neural connection feedbacks!</span>")
+		if(robot)
+			robot.neural_mmi.active = 0
+			robot.neural_mmi.currentUser = null
+			robot.neural_mmi.pod = null
 		eject_mob()
+		robot = null
 
 /obj/machinery/neural_network_pod/proc/connect_brain(var/mob/living/silicon/robot/neural_robot/linked_robot)
 	if(!linked_robot || !istype(linked_robot))

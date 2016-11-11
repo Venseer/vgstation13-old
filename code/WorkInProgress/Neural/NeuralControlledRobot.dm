@@ -5,6 +5,7 @@
 	return
 
 /mob/living/silicon/robot/neural_robot/Login()
+	..()
 	to_chat(src, "<b>Welcome to the Nerual-Network interface of [src].</b>")
 
 /mob/living/silicon/robot/neural_robot/proc/usable_brain()
