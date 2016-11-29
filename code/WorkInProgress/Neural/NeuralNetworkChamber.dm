@@ -84,7 +84,7 @@
 	if(occupant.mind)
 		occupant.mind.transfer_to(robot)
 		robot.neural_mmi.currentUser = occupant
-		robot.neural_mmi.active = 1
+		robot.neural_mmi.inUse = 1
 		robot.neural_mmi.pod = src
 
 		if(robot.client)
@@ -102,7 +102,7 @@
 		if(robot.mind && occupant)
 			robot.mind.transfer_to(occupant)
 			robot.neural_mmi.currentUser = null
-			robot.neural_mmi.active = 0
+			robot.neural_mmi.inUse = 0
 
 	if(occupant && occupant.client)
 		occupant.client.screen.Remove(eject_button)
@@ -118,6 +118,7 @@
 		robot.show_message("<span class='danger' class='big'>Your neural connection feedbacks!</span>")
 		if(robot)
 			robot.neural_mmi.active = 0
+			robot.neural_mmi.inUse = 0
 			robot.neural_mmi.currentUser = null
 			robot.neural_mmi.pod = null
 		eject_mob()
@@ -146,7 +147,6 @@
 		pod_master.eject_mob()
 
 /*Neural Reference*/
-/*HAAAAAAAAACKS :^)*/
 /obj/item/device/neural_reference
 	var/obj/machinery/neural_network_pod/pod_reference = null
 	var/mob/living/mob_reference = null

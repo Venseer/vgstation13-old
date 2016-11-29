@@ -2034,6 +2034,7 @@
 #include "code\WorkInProgress\Neural\NeuralControlledRobot.dm"
 #include "code\WorkInProgress\Neural\NeuralNetworkBrain.dm"
 #include "code\WorkInProgress\Neural\NeuralNetworkChamber.dm"
+#include "code\WorkInProgress\Neural\NeuralNetworkConsole.dm"
 #include "code\ZAS\_docs.dm"
 #include "code\ZAS\_gas_mixture.dm"
 #include "code\ZAS\Airflow.dm"

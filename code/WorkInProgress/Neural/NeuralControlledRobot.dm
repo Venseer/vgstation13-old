@@ -6,13 +6,10 @@
 
 /mob/living/silicon/robot/neural_robot/Login()
 	..()
-	to_chat(src, "<b>Welcome to the Nerual-Network interface of [src].</b>")
+	to_chat(src, "<b>Welcome to the Neural-Network interface of [src].</b>")
 
 /mob/living/silicon/robot/neural_robot/proc/usable_brain()
 	return !isDead()
-
-/mob/living/silicon/robot/neural_robot/proc/check_avaibility()
-	return usable_brain() && neural_mmi.active == 0
 
 /mob/living/silicon/robot/neural_robot/death(gibbed)
 	neural_mmi.pod.robot_death()
@@ -21,3 +18,11 @@
 /mob/living/silicon/robot/neural_robot/gib()
 	neural_mmi.pod.robot_death()
 	..()
+
+/mob/living/silicon/robot/neural_robot/New(loc,var/syndie = 0,var/unfinished = 0,var/startup_sound=null)
+	..(loc,syndie,unfinished,startup_sound)
+	laws = null
+	if(connected_ai)
+		connected_ai.connected_robots -= src
+		connected_ai = null
+		lawupdate = 0
